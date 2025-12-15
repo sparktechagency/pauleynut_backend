@@ -1,0 +1,58 @@
+Mon Dec 15 2025 13:1:12 [SERVER-NAME] info: [32mConfig validation successful.[39m
+Mon Dec 15 2025 13:1:13 [SERVER-NAME] info: [46m🚀 Database connected successfully[49m
+Mon Dec 15 2025 13:1:13 [SERVER-NAME] info: [33m♻️  Socket is listening on same port 9002[39m
+Mon Dec 15 2025 13:1:13 [SERVER-NAME] info: [46m♻️  Application listening on http://10.10.7.103:9002[49m
+Mon Dec 15 2025 13:2:39 [SERVER-NAME] info: [34mSIGTERM received. Shutting down gracefully...[39m
+Mon Dec 15 2025 13:2:39 [SERVER-NAME] info: [32mConfig validation successful.[39m
+Mon Dec 15 2025 13:2:40 [SERVER-NAME] info: [46m🚀 Database connected successfully[49m
+Mon Dec 15 2025 13:2:40 [SERVER-NAME] info: [33m♻️  Socket is listening on same port 9002[39m
+Mon Dec 15 2025 13:2:40 [SERVER-NAME] info: [46m♻️  Application listening on http://10.10.7.103:9002[49m
+Mon Dec 15 2025 13:2:54 [SERVER-NAME] info: [34mSIGTERM received. Shutting down gracefully...[39m
+Mon Dec 15 2025 13:2:54 [SERVER-NAME] info: [32mConfig validation successful.[39m
+Mon Dec 15 2025 13:2:55 [SERVER-NAME] info: [46m🚀 Database connected successfully[49m
+Mon Dec 15 2025 13:2:55 [SERVER-NAME] info: [33m♻️  Socket is listening on same port 9002[39m
+Mon Dec 15 2025 13:2:55 [SERVER-NAME] info: [46m♻️  Application listening on http://10.10.7.103:9002[49m
+Mon Dec 15 2025 13:4:17 [SERVER-NAME] info: [34mSIGTERM received. Shutting down gracefully...[39m
+Mon Dec 15 2025 13:4:18 [SERVER-NAME] info: [32mConfig validation successful.[39m
+Mon Dec 15 2025 13:4:18 [SERVER-NAME] info: [46m🚀 Database connected successfully[49m
+Mon Dec 15 2025 13:4:18 [SERVER-NAME] info: [33m♻️  Socket is listening on same port 9002[39m
+Mon Dec 15 2025 13:4:18 [SERVER-NAME] info: [46m♻️  Application listening on http://10.10.7.103:9002[49m
+Mon Dec 15 2025 13:4:31 [SERVER-NAME] info: [34mSIGTERM received. Shutting down gracefully...[39m
+Mon Dec 15 2025 13:4:31 [SERVER-NAME] info: [32mConfig validation successful.[39m
+Mon Dec 15 2025 13:4:32 [SERVER-NAME] info: [46m🚀 Database connected successfully[49m
+Mon Dec 15 2025 13:4:32 [SERVER-NAME] info: [33m♻️  Socket is listening on same port 9002[39m
+Mon Dec 15 2025 13:4:32 [SERVER-NAME] info: [46m♻️  Application listening on http://10.10.7.103:9002[49m
+Mon Dec 15 2025 13:7:24 [SERVER-NAME] info: [34mSIGTERM received. Shutting down gracefully...[39m
+Mon Dec 15 2025 13:7:25 [SERVER-NAME] info: [32mConfig validation successful.[39m
+Mon Dec 15 2025 13:7:25 [SERVER-NAME] info: [46m🚀 Database connected successfully[49m
+Mon Dec 15 2025 13:7:25 [SERVER-NAME] info: [33m♻️  Socket is listening on same port 9002[39m
+Mon Dec 15 2025 13:7:25 [SERVER-NAME] info: [46m♻️  Application listening on http://10.10.7.103:9002[49m
+Mon Dec 15 2025 13:7:44 [SERVER-NAME] info: [34mSIGTERM received. Shutting down gracefully...[39m
+Mon Dec 15 2025 13:7:45 [SERVER-NAME] info: [32mConfig validation successful.[39m
+Mon Dec 15 2025 13:7:45 [SERVER-NAME] info: [46m🚀 Database connected successfully[49m
+Mon Dec 15 2025 13:7:45 [SERVER-NAME] info: [33m♻️  Socket is listening on same port 9002[39m
+Mon Dec 15 2025 13:7:45 [SERVER-NAME] info: [46m♻️  Application listening on http://10.10.7.103:9002[49m
+Mon Dec 15 2025 13:9:2 [SERVER-NAME] info: [34mSIGTERM received. Shutting down gracefully...[39m
+Mon Dec 15 2025 13:9:2 [SERVER-NAME] info: [32mConfig validation successful.[39m
+Mon Dec 15 2025 13:9:3 [SERVER-NAME] info: [46m🚀 Database connected successfully[49m
+Mon Dec 15 2025 13:9:3 [SERVER-NAME] info: [33m♻️  Socket is listening on same port 9002[39m
+Mon Dec 15 2025 13:9:3 [SERVER-NAME] info: [46m♻️  Application listening on http://10.10.7.103:9002[49m
+Mon Dec 15 2025 13:9:52 [SERVER-NAME] info: [36m🎨 --------------> Database seeding start <--------------- 🎨[39m
+Mon Dec 15 2025 13:9:53 [SERVER-NAME] error: [31m💥 Error seeding users: 💥[39m E11000 duplicate key error collection: pauleynuts_backend.users index: contact_1 dup key: { contact: null }
+Mon Dec 15 2025 13:9:53 [SERVER-NAME] info: [32m🎉 --------------> Database seeding completed <--------------- 🎉[39m
+Mon Dec 15 2025 13:10:38 [SERVER-NAME] info: [36m🎨 --------------> Database seeding start <--------------- 🎨[39m
+Mon Dec 15 2025 13:10:39 [SERVER-NAME] error: [31m💥 Error seeding users: 💥[39m E11000 duplicate key error collection: pauleynuts_backend.users index: contact_1 dup key: { contact: null }
+Mon Dec 15 2025 13:10:39 [SERVER-NAME] info: [32m🎉 --------------> Database seeding completed <--------------- 🎉[39m
+Mon Dec 15 2025 13:11:7 [SERVER-NAME] info: [34mSIGINT received. Shutting down gracefully...[39m
+Mon Dec 15 2025 13:11:11 [SERVER-NAME] info: [32mConfig validation successful.[39m
+Mon Dec 15 2025 13:11:12 [SERVER-NAME] info: [46m🚀 Database connected successfully[49m
+Mon Dec 15 2025 13:11:12 [SERVER-NAME] info: [33m♻️  Socket is listening on same port 9002[39m
+Mon Dec 15 2025 13:11:12 [SERVER-NAME] info: [46m♻️  Application listening on http://10.10.7.103:9002[49m
+Mon Dec 15 2025 13:11:27 [SERVER-NAME] info: [36m🎨 --------------> Database seeding start <--------------- 🎨[39m
+Mon Dec 15 2025 13:11:29 [SERVER-NAME] error: [31m💥 Error seeding users: 💥[39m E11000 duplicate key error collection: pauleynuts_backend.users index: contact_1 dup key: { contact: null }
+Mon Dec 15 2025 13:11:29 [SERVER-NAME] info: [32m🎉 --------------> Database seeding completed <--------------- 🎉[39m
+Mon Dec 15 2025 13:12:0 [SERVER-NAME] info: 10.10.7.103 - POST /api/v1/auth/forget-password 200 - 128.834 ms
+Mon Dec 15 2025 13:12:6 [SERVER-NAME] info: Mail send successfully
+Mon Dec 15 2025 13:12:49 [SERVER-NAME] info: 10.10.7.103 - POST /api/v1/auth/verify-otp 200 - 161.294 ms
+Mon Dec 15 2025 13:15:44 [SERVER-NAME] info: 10.10.7.103 - POST /api/v1/auth/reset-password 200 - 402.184 ms
+Mon Dec 15 2025 13:16:59 [SERVER-NAME] info: [34mSIGINT received. Shutting down gracefully...[39m

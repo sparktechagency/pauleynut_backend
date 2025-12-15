@@ -1,11 +1,32 @@
 import { boolean, z } from 'zod';
 
 const createVerifyContactZodSchema = z.object({
-     body: z.object({
-          contact: z.string({ required_error: 'Contact is required' }),
-          oneTimeCode: z.number({ required_error: 'One time code is required' }),
-          isForLogin: boolean({ required_error: 'Is for login is required' }),
-     }),
+     body: z
+          .object({
+               contact: z.string().optional(),
+               email: z.string().optional(),
+               oneTimeCode: z.number({ required_error: 'One time code is required' }),
+               isForLogin: boolean({ required_error: 'Is for login is required' }),
+          })
+
+          .superRefine(async (data, ctx) => {
+               // Check if the role is not 'USER' and add a custom error
+               if (data.isForLogin && !data.contact) {
+                    ctx.addIssue({
+                         path: ['contact'],
+                         message: 'Contact is required for login',
+                         code: z.ZodIssueCode.custom,
+                    });
+               }
+
+               if (!data.isForLogin && !data.email) {
+                    ctx.addIssue({
+                         path: ['email'],
+                         message: 'Email is required for reset password',
+                         code: z.ZodIssueCode.custom,
+                    });
+               }
+          }),
 });
 
 const createLoginZodSchema = z.object({

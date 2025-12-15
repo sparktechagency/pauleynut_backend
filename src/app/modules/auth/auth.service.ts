@@ -37,8 +37,8 @@ const loginUserFromDB = async (payload: ILoginData) => {
      //check verified and status
      if (!isExistUser.verified) {
           //send mail
-          const otp = generateOTP(6);
-          const value = { otp, email: isExistUser.email };
+          const otp = generateOTP(4);
+          const value = { otp, email: isExistUser.email! };
           const forgetPassword = emailTemplate.resetPassword(value);
           emailHelper.sendEmail(forgetPassword);
 
@@ -71,7 +71,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
 const forgetPasswordToDB = async (email: string) => {
      const isExistUser = await User.isExistUserByEmail(email);
      if (!isExistUser) {
-          throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+          throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist*!");
      }
 
      //send mail
@@ -136,6 +136,7 @@ const forgetPasswordByUrlToDB = async (email: string) => {
      // Generate JWT token for password reset valid for 10 minutes
      const jwtPayload = { id: isExistUser._id, email: isExistUser.email, role: isExistUser.role };
      const resetToken = createToken(jwtPayload, config.jwt.jwt_secret as string, config.reset_pass_expire_time as string);
+     console.log('🚀 ~ forgetPasswordByUrlToDB ~ resetToken:', resetToken);
 
      // Construct password reset URL
      const resetUrl = `${config.frontend_url}/auth/login/set_password?email=${isExistUser.email}&token=${resetToken}`;
@@ -148,15 +149,20 @@ const forgetPasswordByUrlToDB = async (email: string) => {
 };
 
 //verify email
-const verifyContactToDB = async (payload: IVerifyContact & { isForLogin: boolean }) => {
-     const { contact, oneTimeCode } = payload;
-     const isExistUser = await User.findOne({ contact }).select('+authentication');
+const verifyContactToDB = async (payload: IVerifyContact) => {
+     const { contact, oneTimeCode, email } = payload;
+     let isExistUser;
+     if (payload.isForLogin) {
+          isExistUser = await User.findOne({ contact }).select('+authentication');
+     } else {
+          isExistUser = await User.findOne({ email }).select('+authentication');
+     }
      if (!isExistUser) {
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
      }
 
      if (!oneTimeCode) {
-          throw new AppError(StatusCodes.BAD_REQUEST, 'Please give the otp, check your email we send a code');
+          throw new AppError(StatusCodes.BAD_REQUEST, 'Please give the otp, check your email or contact we send a code');
      }
 
      if (isExistUser.authentication?.oneTimeCode !== oneTimeCode) {
