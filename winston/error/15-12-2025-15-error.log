@@ -1,5 +1,0 @@
-Mon Dec 15 2025 15:43:6 [SERVER-NAME] error: 10.10.7.103 - PATCH /api/v1/campaign 404 - 2.563 ms
-Mon Dec 15 2025 15:43:57 [SERVER-NAME] error: 10.10.7.103 - PATCH /api/v1/campaign 404 - 3.043 ms
-Mon Dec 15 2025 15:44:4 [SERVER-NAME] error: 10.10.7.103 - POST /api/v1/campaign 400 - 72.679 ms
-Mon Dec 15 2025 15:52:0 [SERVER-NAME] error: 10.10.7.103 - POST /api/v1/campaign/693fd8701a0a266f71861447 404 - 0.765 ms
-Mon Dec 15 2025 15:52:26 [SERVER-NAME] error: 10.10.7.103 - DELETE /api/v1/campaign/693fd8701a0a266f71861447 404 - 147.951 ms
