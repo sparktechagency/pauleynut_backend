@@ -9,7 +9,7 @@ import { IInvitationHistory } from '../InvitationHistory/InvitationHistory.inter
 import { InvitationType } from '../InvitationHistory/InvitationHistory.enum';
 import { InvitationHistory } from '../InvitationHistory/InvitationHistory.model';
 import sendSMS from '../../../shared/sendSMS';
-import { paymentStatusType } from '../Transaction/Transaction.interface';
+import { ITransaction, paymentStatusType } from '../Transaction/Transaction.interface';
 import { Transaction } from '../Transaction/Transaction.model';
 import mongoose from 'mongoose';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
@@ -17,6 +17,7 @@ import { Content } from '../content/content.model';
 import { UserLevelStrategy } from '../content/content.interface';
 import { USER_ROLES } from '../../../enums/user';
 import { INotification } from '../notification/notification.interface';
+import { IUser } from '../user/user.interface';
 
 const createCampaign = async (payload: ICampaign & { image?: string }): Promise<ICampaign> => {
      const createCampaignDto = {
@@ -160,6 +161,21 @@ const invitePeopleToCampaign = async (
 
                await User.updateOne({ _id: isExitUser._id }, { $inc: { totalDonated: payload.donationAmount || 0, totalInvited: payload.myInvitees.length } }, { session });
 
+               // update campaign
+               await Campaign.updateOne(
+                    { _id: campaign._id },
+                    {
+                         $inc: {
+                              overall_raised: payload.donationAmount || 0,
+                              total_invitees: payload.myInvitees.length,
+                         },
+                         $dec: {
+                              targetAmount: payload.donationAmount || 0,
+                         },
+                    },
+                    { session },
+               );
+
                // level up the donor
                const levelStrategy = await Content.findOne().select('userLevelStrategy').lean();
 
@@ -233,6 +249,61 @@ const invitePeopleToCampaign = async (
      }
 };
 
+const alertAboutCampaign = async (payload: Partial<ICampaign>, campaignId: string) => {
+     // Step 1: Retrieve and update the campaign
+     const campaign = await Campaign.findByIdAndUpdate(campaignId, payload, {
+          new: true,
+          runValidators: true,
+     }).select('alert message crea contactPerson_phone targetAmount overall_raised total_invitees endDate');
+
+     // If campaign not found, throw an error
+     if (!campaign) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found');
+     }
+
+     // Step 2: Fetch campaign histories
+     const campaignHistories = await Transaction.find({ campaignId }).select('donorPhone');
+
+     // Step 3: Collect phone numbers (valid and unique)
+     const phonesToSendAlert = [campaign.contactPerson_phone, ...campaignHistories.map((transaction: Partial<ITransaction>) => transaction.donorPhone)];
+
+     // Filter out invalid phone numbers (null, undefined, or empty strings)
+     const validPhones = phonesToSendAlert.filter((phone): phone is string => {
+          // Explicitly check if phone is a string and if it is not empty
+          return typeof phone === 'string' && phone.trim() !== '';
+     });
+
+     // Get current date
+     const now = new Date();
+
+     // Calculate hours remaining until campaign expiry
+     const campaignEndDate = new Date(campaign.endDate);
+     const remainingHours = Math.max(Math.floor((campaignEndDate.getTime() - now.getTime()) / (1000 * 60 * 60)), 0); // Ensure non-negative hours
+
+     // Prepare the message content
+     const messageTemplate = (raisedAmount: number, inviteesCount: number, donorsCount: number) => `
+        Your Pass It Along Chain is expiring in ${remainingHours} hours.
+        You made a big difference. ${raisedAmount} raised!!
+        ${inviteesCount} Invitees, ${donorsCount} Donors.
+    `;
+
+     // Step 4: Send SMS to all valid phone numbers
+     await Promise.all(
+          validPhones.map(async (phone) => {
+               try {
+                    // Sending SMS with dynamic content
+                    await sendSMS(phone, messageTemplate(campaign.overall_raised, campaign.total_invitees, campaignHistories.length));
+               } catch (error) {
+                    console.error(`Error sending SMS to ${phone}:`, error);
+                    // Optionally, you could log the error or handle it based on your needs
+               }
+          }),
+     );
+
+     // Step 5: Log the campaign history for debugging
+     console.log('Campaign history:', campaignHistories);
+};
+
 export const campaignService = {
      createCampaign,
      getAllCampaigns,
@@ -242,4 +313,5 @@ export const campaignService = {
      hardDeleteCampaign,
      getCampaignById,
      invitePeopleToCampaign,
+     alertAboutCampaign,
 };

@@ -48,6 +48,15 @@ export const createContentValidation = z.object({
           // User Level Strategy
           userLevelStrategy: z.array(userLevelStrategySchema).min(1, 'At least one user level strategy is required'),
 
+          notificationStrategy: z.object({
+               campaignExpiredAlert: z.boolean(),
+               lowProgressWarning: z.boolean(),
+               mileStoneAlert: z.boolean(),
+               mileStoneAlertMessage: z.string(),
+               weeklyProgressAlert: z.boolean(),
+               weeklyProgressAlertMessage: z.string(),
+          }),
+
           // Media
           gallery: z.array(z.string().url('Invalid image URL')).optional(),
 
@@ -76,6 +85,17 @@ export const updateContentValidation = z.object({
 
           // User Level Strategy
           userLevelStrategy: z.array(userLevelStrategySchema).min(1, 'At least one user level strategy is required').optional(),
+
+          notificationStrategy: z
+               .object({
+                    campaignExpiredAlert: z.boolean().optional(),
+                    lowProgressWarning: z.boolean().optional(),
+                    mileStoneAlert: z.boolean().optional(),
+                    mileStoneAlertMessage: z.string().optional(),
+                    weeklyProgressAlert: z.boolean().optional(),
+                    weeklyProgressAlertMessage: z.string().optional(),
+               })
+               .optional(),
 
           // Media
           gallery: z.array(z.string().url('Invalid image URL')).optional(),

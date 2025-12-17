@@ -59,6 +59,16 @@ const contentSchema = new Schema<IContent, ContentModel>(
           // User Level Strategy
           userLevelStrategy: [userLevelStrategySchema],
 
+          // notificationStrategy
+          notificationStrategy: {
+               campaignExpiredAlert: Boolean,
+               lowProgressWarning: Boolean,
+               mileStoneAlert: Boolean,
+               mileStoneAlertMessage: String,
+               weeklyProgressAlert: Boolean,
+               weeklyProgressAlertMessage: String,
+          },
+
           // Media
           gallery: [{ type: String }],
 

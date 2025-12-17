@@ -32,6 +32,8 @@ const commonFields = {
      cause_description: z.string().min(10, 'Cause description is required'),
      cause_mission: z.string().optional(),
      cause_image: z.string().url('Invalid image URL').or(z.literal('')).optional(),
+     alert: z.string().optional(),
+     message: z.string().optional(),
 };
 
 const createCampaignZodSchema = z.object({
@@ -63,6 +65,8 @@ const updateCampaignZodSchema = z.object({
                     .transform((val) => new Date(val))
                     .optional(),
                contactPerson_email: z.string().email('Invalid email address').optional(),
+               alert: z.string().optional(),
+               message: z.string().optional(),
           })
           .refine(
                (data) => {
@@ -122,8 +126,19 @@ const invitePeopleToCampaignZodSchema = z.object({
      }),
 });
 
+const alertAboutCampaignZodSchema = z.object({
+     body: z.object({
+          alert: z.string(),
+          message: z.string(),
+     }),
+     params: z.object({
+          campaignId: z.string().describe('Campaign ID'),
+     }),
+});
+
 export const campaignValidation = {
      createCampaignZodSchema,
      updateCampaignZodSchema,
      invitePeopleToCampaignZodSchema,
+     alertAboutCampaignZodSchema,
 };

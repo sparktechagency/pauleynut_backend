@@ -9,12 +9,13 @@ export interface ICampaign extends Document {
      overall_raised: number;
      description: string;
      title: string;
+     alert?: string;
+     message?: string;
      address: string;
      donor_name: string;
      dafPartner: string;
      internalTrackingId: string;
      campaignStatus: CampaignStatus;
-     total_donated: number;
      total_invitees: number;
      organization_name: string;
      organization_network: string;

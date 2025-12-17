@@ -32,6 +32,13 @@ router.post(
      campaignController.invitePeopleToCampaign,
 );
 
+router.post(
+     '/alert/:campaignId',
+     auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
+     validateRequest(campaignValidation.alertAboutCampaignZodSchema),
+     campaignController.alertAboutCampaign,
+);
+
 router.patch(
      '/:id',
      fileUploadHandler(),
