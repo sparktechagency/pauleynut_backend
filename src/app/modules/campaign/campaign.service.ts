@@ -13,6 +13,8 @@ import { paymentStatusType } from '../Transaction/Transaction.interface';
 import { Transaction } from '../Transaction/Transaction.model';
 import mongoose from 'mongoose';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
+import { Content } from '../content/content.model';
+import { UserLevelStrategy } from '../content/content.interface';
 
 const createCampaign = async (payload: ICampaign & { image?: string }): Promise<ICampaign> => {
      const createCampaignDto = {
@@ -100,13 +102,13 @@ const invitePeopleToCampaign = async (
           throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found.');
      }
      // Check Double User
-     const isExitUser = await User.findById(user.id)
+     const isExitUser = await User.findById(user.id);
 
      if (!isExitUser || !isExitUser.contact) {
           throw new AppError(StatusCodes.NOT_FOUND, 'User not found.');
      }
-     const isInvitationUser = await User.findById({ _id: payload.invitationIrecievedFrom });
-     if (!isInvitationUser) {
+     const isExistInvitorUser = await User.findById({ _id: payload.invitationIrecievedFrom });
+     if (!isExistInvitorUser) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invitation User not found.');
      }
 
@@ -127,8 +129,6 @@ const invitePeopleToCampaign = async (
                await sendSMS(invitee.invitationForPhone, `You've been invited to join campaign "${campaign.title}". Join now!`);
           }
      }
-
-
 
      const session = await mongoose.startSession();
      session.startTransaction();
@@ -154,19 +154,51 @@ const invitePeopleToCampaign = async (
                     throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create donation record');
                }
 
-               console.log(payload.myInvitees.length)
-               console.log(payload.donationAmount)
-               await User.updateOne({ _id: isInvitationUser._id }, { $inc: { totalRaised: payload.donationAmount || 0 } }, { session });
+               await User.updateOne({ _id: isExistInvitorUser._id }, { $inc: { totalRaised: payload.donationAmount || 0 } }, { session });
 
                await User.updateOne({ _id: isExitUser._id }, { $inc: { totalDonated: payload.donationAmount || 0, totalInvited: payload.myInvitees.length } }, { session });
+
+               // level up the donor
+               const levelStrategy = await Content.findOne().select('userLevelStrategy').lean();
+
+               if (levelStrategy?.userLevelStrategy && Array.isArray(levelStrategy.userLevelStrategy) && levelStrategy.userLevelStrategy.length > 0) {
+                    const userTotalRaised = isExitUser.totalRaised || 0;
+                    const userTotalDonated = isExitUser.totalDonated || 0;
+                    const userTotalInvited = isExitUser.totalInvited || 0;
+
+                    // Find the appropriate level based on total raised, donated, and invited
+                    const userLevelTobeUpdatedTo = levelStrategy.userLevelStrategy.find(
+                         (strategy: UserLevelStrategy) => userTotalRaised >= strategy?.targetRaising && userTotalDonated >= strategy?.targetDonation && userTotalInvited >= strategy?.targetInvitation,
+                    );
+
+                    if (userLevelTobeUpdatedTo) {
+                         await User.updateOne({ _id: isExitUser._id }, { userLevel: userLevelTobeUpdatedTo.level }, { session });
+                    }
+
+                    const invitorTotalRaised = isExistInvitorUser.totalRaised || 0;
+                    const invitorTotalDonated = isExistInvitorUser.totalDonated || 0;
+                    const invitorTotalInvited = isExistInvitorUser.totalInvited || 0;
+
+                    // Find the appropriate level for the invitor
+                    const invitorLevelTobeUpdatedTo = levelStrategy.userLevelStrategy.find(
+                         (strategy: UserLevelStrategy) =>
+                              invitorTotalRaised >= strategy?.targetRaising && invitorTotalDonated >= strategy?.targetDonation && invitorTotalInvited >= strategy?.targetInvitation,
+                    );
+
+                    if (invitorLevelTobeUpdatedTo) {
+                         await User.updateOne({ _id: isExistInvitorUser._id }, { userLevel: invitorLevelTobeUpdatedTo.level }, { session });
+                    }
+               } else {
+                    console.log('or strategy is empty');
+               }
           }
 
           // Commit the transaction if everything is successful
           await session.commitTransaction();
           session.endSession();
 
-          // // notify to admin ⏰
-          // await sendNotifications()
+          // notify to admin ⏰
+          await sendNotifications();
 
           return {
                message: 'People invited successfully',

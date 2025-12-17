@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { IContent, ContentModel } from './content.interface';
+import { UserLevel } from '../user/user.enum';
 
 const founderSchema = new Schema(
      {
@@ -13,10 +14,13 @@ const founderSchema = new Schema(
 
 const userLevelStrategySchema = new Schema(
      {
-          level: { type: Number, required: true },
+          level: { type: String, required: true, enum: Object.values(UserLevel) },
           title: { type: String, required: true },
           description: { type: String, required: true },
           benefits: [{ type: String }],
+          targetInvitation: { type: Number, required: true },
+          targetDonation: { type: Number, required: true },
+          targetRaising: { type: Number, required: true },
      },
      { _id: false },
 );

@@ -1,4 +1,5 @@
 import { Document, Model, ObjectId } from 'mongoose';
+import { UserLevel } from '../user/user.enum';
 
 export type Founder = {
      name: string;
@@ -8,7 +9,7 @@ export type Founder = {
 };
 
 export type UserLevelStrategy = {
-     level: number;
+     level: UserLevel;
      title: string;
      description: string;
      benefits?: string[];

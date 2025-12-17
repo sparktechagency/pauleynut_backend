@@ -8,10 +8,14 @@ const founderSchema = z.object({
 });
 
 const userLevelStrategySchema = z.object({
-     level: z.number({ required_error: 'Level is required' }).int().positive(),
+     level: z.string({ required_error: 'Level is required' }),
      title: z.string({ required_error: 'Title is required' }),
      description: z.string({ required_error: 'Description is required' }),
      benefits: z.array(z.string()).min(1, 'At least one benefit is required').optional(),
+
+     targetInvitation: z.number({ required_error: 'Target invitation is required' }).int().min(0),
+     targetDonation: z.number({ required_error: 'Target donation is required' }).min(0),
+     targetRaising: z.number({ required_error: 'Target raising is required' }).min(0),
 });
 
 const privacyPolicySchema = z.object({
