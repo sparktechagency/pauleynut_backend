@@ -15,6 +15,8 @@ import mongoose from 'mongoose';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
 import { Content } from '../content/content.model';
 import { UserLevelStrategy } from '../content/content.interface';
+import { USER_ROLES } from '../../../enums/user';
+import { INotification } from '../notification/notification.interface';
 
 const createCampaign = async (payload: ICampaign & { image?: string }): Promise<ICampaign> => {
      const createCampaignDto = {
@@ -197,8 +199,23 @@ const invitePeopleToCampaign = async (
           await session.commitTransaction();
           session.endSession();
 
-          // notify to admin ⏰
-          await sendNotifications();
+          // notify to admin
+          const admins = await User.find({ role: { $in: [USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN] } })
+               .select('_id')
+               .lean();
+          for (const element of admins) {
+               const notificationData = {
+                    title: 'New Donation',
+                    referenceModel: 'Transaction' as INotification['referenceModel'],
+                    text: `New Donation from ${isExitUser.name}`,
+                    type: 'PAYMENT' as INotification['type'],
+                    receiver: element._id,
+                    message: `New Donation from ${isExitUser.name}`,
+                    read: false,
+               };
+
+               await sendNotifications(notificationData);
+          }
 
           return {
                message: 'People invited successfully',

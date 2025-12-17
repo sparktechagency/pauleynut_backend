@@ -25,7 +25,17 @@ const updateTransactionZodSchema = z.object({
      }),
 });
 
+const sendSuccessMessageZodSchema = z.object({
+     params: z.object({
+          transactionId: z.string({ required_error: 'Transaction ID is required' }),
+     }),
+     body: z.object({
+          message: z.string({ required_error: 'Message is required' }),
+     }),
+});
+
 export const TransactionValidation = {
      createTransactionZodSchema,
      updateTransactionZodSchema,
+     sendSuccessMessageZodSchema,
 };

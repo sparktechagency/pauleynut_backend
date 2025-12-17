@@ -13,7 +13,7 @@ export type UserLevelStrategy = {
      title: string;
      description: string;
      benefits?: string[];
-     targetInvitation: number; // ⏰
+     targetInvitation: number; //
      targetDonation: number;
      targetRaising: number;
 };

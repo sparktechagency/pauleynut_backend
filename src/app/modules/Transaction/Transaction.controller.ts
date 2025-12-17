@@ -82,7 +82,19 @@ const getTransactionById = catchAsync(async (req: Request, res: Response) => {
           message: 'Transaction retrieved successfully',
           data: result || undefined,
      });
-});  
+});
+
+const sendSuccessMessage = catchAsync(async (req: Request, res: Response) => {
+     const { transactionId } = req.params;
+     const result = await TransactionService.sendSuccessMessage(transactionId, req.body);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Success message sent successfully',
+          data: result || undefined,
+     });
+});
 
 export const TransactionController = {
      createTransaction,
@@ -91,5 +103,6 @@ export const TransactionController = {
      updateTransaction,
      deleteTransaction,
      hardDeleteTransaction,
-     getTransactionById
+     getTransactionById,
+     sendSuccessMessage,
 };
