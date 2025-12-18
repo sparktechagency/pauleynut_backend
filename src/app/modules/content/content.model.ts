@@ -1,5 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { IContent, ContentModel } from './content.interface';
+import { UserLevel } from '../user/user.enum';
+import { progressAlertDayEnum, progressAlertFrequeincyEnum } from './content.enum';
 
 const founderSchema = new Schema(
      {
@@ -13,10 +15,13 @@ const founderSchema = new Schema(
 
 const userLevelStrategySchema = new Schema(
      {
-          level: { type: Number, required: true },
+          level: { type: String, required: true, enum: Object.values(UserLevel) },
           title: { type: String, required: true },
           description: { type: String, required: true },
           benefits: [{ type: String }],
+          targetInvitation: { type: Number, required: true },
+          targetDonation: { type: Number, required: true },
+          targetRaising: { type: Number, required: true },
      },
      { _id: false },
 );
@@ -54,6 +59,21 @@ const contentSchema = new Schema<IContent, ContentModel>(
 
           // User Level Strategy
           userLevelStrategy: [userLevelStrategySchema],
+
+          // notificationStrategy
+          notificationStrategy: {
+               campaignExpiredAlert: Boolean,
+               lowProgressWarning: Boolean,
+               mileStoneAlert: Boolean,
+               mileStoneAlertMessage: String,
+               progressAlert: Boolean,
+               progressAlertMessage: String,
+               progressAlertSchedule: {
+                    frequency: { type: String, enum: Object.values(progressAlertFrequeincyEnum), required: true },
+                    day: { type: String, enum: Object.values(progressAlertDayEnum), required: true },
+                    time: { type: String, default: '10:00' },
+               },
+          },
 
           // Media
           gallery: [{ type: String }],

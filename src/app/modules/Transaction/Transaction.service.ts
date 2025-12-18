@@ -3,6 +3,7 @@ import AppError from '../../../errors/AppError';
 import { ITransaction } from './Transaction.interface';
 import { Transaction } from './Transaction.model';
 import QueryBuilder from '../../builder/QueryBuilder';
+import sendSMS from '../../../shared/sendSMS';
 
 const createTransaction = async (payload: ITransaction): Promise<ITransaction> => {
      const result = await Transaction.create(payload);
@@ -56,6 +57,17 @@ const getTransactionById = async (id: string): Promise<ITransaction | null> => {
      return result;
 };
 
+const sendSuccessMessage = async (id: string, payload: { message: string }): Promise<ITransaction | null> => {
+     const isExistTransaction = await Transaction.findById(id);
+     if (!isExistTransaction) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Transaction not found.');
+     }
+
+     await sendSMS(isExistTransaction.donorPhone!, payload.message);
+
+     return isExistTransaction;
+};
+
 export const TransactionService = {
      createTransaction,
      getAllTransactions,
@@ -64,4 +76,5 @@ export const TransactionService = {
      deleteTransaction,
      hardDeleteTransaction,
      getTransactionById,
+     sendSuccessMessage,
 };

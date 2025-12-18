@@ -5,6 +5,7 @@ import config from '../../../config';
 import { USER_ROLES } from '../../../enums/user';
 import AppError from '../../../errors/AppError';
 import { IUser, UserModel } from './user.interface';
+import { UserLevel } from './user.enum';
 
 const userSchema = new Schema<IUser, UserModel>(
      {
@@ -94,7 +95,11 @@ const userSchema = new Schema<IUser, UserModel>(
                },
                select: false,
           },
-          userLevel: String,
+          userLevel: {
+               type: String,
+               enum: Object.values(UserLevel),
+               default: UserLevel.L0,
+          },
           totalRaised: {
                type: Number,
                default: 0,

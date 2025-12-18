@@ -15,7 +15,7 @@ const TransactionSchema = new Schema<ITransaction>(
      },
      { timestamps: true },
 );
-
+// pre hooks
 TransactionSchema.pre('find', function (next) {
      this.find({ isDeleted: false });
      next();

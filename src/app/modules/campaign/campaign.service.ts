@@ -9,10 +9,16 @@ import { IInvitationHistory } from '../InvitationHistory/InvitationHistory.inter
 import { InvitationType } from '../InvitationHistory/InvitationHistory.enum';
 import { InvitationHistory } from '../InvitationHistory/InvitationHistory.model';
 import sendSMS from '../../../shared/sendSMS';
-import { paymentStatusType } from '../Transaction/Transaction.interface';
+import { ITransaction, paymentStatusType } from '../Transaction/Transaction.interface';
 import { Transaction } from '../Transaction/Transaction.model';
 import mongoose from 'mongoose';
 import { sendNotifications } from '../../../helpers/notificationsHelper';
+import { Content } from '../content/content.model';
+import { UserLevelStrategy } from '../content/content.interface';
+import { USER_ROLES } from '../../../enums/user';
+import { INotification } from '../notification/notification.interface';
+import { IUser } from '../user/user.interface';
+import { CampaignStatus } from './campaign.enum';
 
 const createCampaign = async (payload: ICampaign & { image?: string }): Promise<ICampaign> => {
      const createCampaignDto = {
@@ -97,16 +103,19 @@ const invitePeopleToCampaign = async (
      }
      const campaign = await Campaign.findById(campaignId);
      if (!campaign) {
-          throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found.');
+          throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found.Or its already reached its target amount.');
+     }
+     if (campaign.overall_raised >= campaign.targetAmount) {
+          await Campaign.updateOne({ _id: campaign._id }, { campaignStatus: CampaignStatus.COMPLETED });
      }
      // Check Double User
-     const isExitUser = await User.findById(user.id)
+     const isExitUser = await User.findById(user.id);
 
      if (!isExitUser || !isExitUser.contact) {
           throw new AppError(StatusCodes.NOT_FOUND, 'User not found.');
      }
-     const isInvitationUser = await User.findById({ _id: payload.invitationIrecievedFrom });
-     if (!isInvitationUser) {
+     const isExistInvitorUser = await User.findById({ _id: payload.invitationIrecievedFrom });
+     if (!isExistInvitorUser) {
           throw new AppError(StatusCodes.NOT_FOUND, 'Invitation User not found.');
      }
 
@@ -127,8 +136,6 @@ const invitePeopleToCampaign = async (
                await sendSMS(invitee.invitationForPhone, `You've been invited to join campaign "${campaign.title}". Join now!`);
           }
      }
-
-
 
      const session = await mongoose.startSession();
      session.startTransaction();
@@ -154,19 +161,81 @@ const invitePeopleToCampaign = async (
                     throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create donation record');
                }
 
-               console.log(payload.myInvitees.length)
-               console.log(payload.donationAmount)
-               await User.updateOne({ _id: isInvitationUser._id }, { $inc: { totalRaised: payload.donationAmount || 0 } }, { session });
+               await User.updateOne({ _id: isExistInvitorUser._id }, { $inc: { totalRaised: payload.donationAmount || 0 } }, { session });
 
                await User.updateOne({ _id: isExitUser._id }, { $inc: { totalDonated: payload.donationAmount || 0, totalInvited: payload.myInvitees.length } }, { session });
+
+               // update campaign
+               await Campaign.updateOne(
+                    { _id: campaign._id },
+                    {
+                         $inc: {
+                              overall_raised: payload.donationAmount || 0,
+                              total_invitees: payload.myInvitees.length,
+                         },
+                         $dec: {
+                              targetAmount: payload.donationAmount || 0,
+                         },
+                    },
+                    { session },
+               );
+
+               // level up the donor
+               const levelStrategy = await Content.findOne().select('userLevelStrategy').lean();
+
+               if (levelStrategy?.userLevelStrategy && Array.isArray(levelStrategy.userLevelStrategy) && levelStrategy.userLevelStrategy.length > 0) {
+                    const userTotalRaised = isExitUser.totalRaised || 0;
+                    const userTotalDonated = isExitUser.totalDonated || 0;
+                    const userTotalInvited = isExitUser.totalInvited || 0;
+
+                    // Find the appropriate level based on total raised, donated, and invited
+                    const userLevelTobeUpdatedTo = levelStrategy.userLevelStrategy.find(
+                         (strategy: UserLevelStrategy) => userTotalRaised >= strategy?.targetRaising && userTotalDonated >= strategy?.targetDonation && userTotalInvited >= strategy?.targetInvitation,
+                    );
+
+                    if (userLevelTobeUpdatedTo) {
+                         await User.updateOne({ _id: isExitUser._id }, { userLevel: userLevelTobeUpdatedTo.level }, { session });
+                    }
+
+                    const invitorTotalRaised = isExistInvitorUser.totalRaised || 0;
+                    const invitorTotalDonated = isExistInvitorUser.totalDonated || 0;
+                    const invitorTotalInvited = isExistInvitorUser.totalInvited || 0;
+
+                    // Find the appropriate level for the invitor
+                    const invitorLevelTobeUpdatedTo = levelStrategy.userLevelStrategy.find(
+                         (strategy: UserLevelStrategy) =>
+                              invitorTotalRaised >= strategy?.targetRaising && invitorTotalDonated >= strategy?.targetDonation && invitorTotalInvited >= strategy?.targetInvitation,
+                    );
+
+                    if (invitorLevelTobeUpdatedTo) {
+                         await User.updateOne({ _id: isExistInvitorUser._id }, { userLevel: invitorLevelTobeUpdatedTo.level }, { session });
+                    }
+               } else {
+                    console.log('or strategy is empty');
+               }
           }
 
           // Commit the transaction if everything is successful
           await session.commitTransaction();
           session.endSession();
 
-          // // notify to admin ⏰
-          // await sendNotifications()
+          // notify to admin
+          const admins = await User.find({ role: { $in: [USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN] } })
+               .select('_id')
+               .lean();
+          for (const element of admins) {
+               const notificationData = {
+                    title: 'New Donation',
+                    referenceModel: 'Transaction' as INotification['referenceModel'],
+                    text: `New Donation from ${isExitUser.name}`,
+                    type: 'PAYMENT' as INotification['type'],
+                    receiver: element._id,
+                    message: `New Donation from ${isExitUser.name}`,
+                    read: false,
+               };
+
+               await sendNotifications(notificationData);
+          }
 
           return {
                message: 'People invited successfully',
@@ -184,6 +253,61 @@ const invitePeopleToCampaign = async (
      }
 };
 
+const alertAboutCampaign = async (payload: Partial<ICampaign>, campaignId: string) => {
+     // Step 1: Retrieve and update the campaign
+     const campaign = await Campaign.findByIdAndUpdate(campaignId, payload, {
+          new: true,
+          runValidators: true,
+     }).select('alert message crea contactPerson_phone targetAmount overall_raised total_invitees endDate');
+
+     // If campaign not found, throw an error
+     if (!campaign) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found');
+     }
+
+     // Step 2: Fetch campaign histories
+     const campaignHistories = await Transaction.find({ campaignId }).select('donorPhone');
+
+     // Step 3: Collect phone numbers (valid and unique)
+     const phonesToSendAlert = [campaign.contactPerson_phone, ...campaignHistories.map((transaction: Partial<ITransaction>) => transaction.donorPhone)];
+
+     // Filter out invalid phone numbers (null, undefined, or empty strings)
+     const validPhones = phonesToSendAlert.filter((phone): phone is string => {
+          // Explicitly check if phone is a string and if it is not empty
+          return typeof phone === 'string' && phone.trim() !== '';
+     });
+
+     // Get current date
+     const now = new Date();
+
+     // Calculate hours remaining until campaign expiry
+     const campaignEndDate = new Date(campaign.endDate);
+     const remainingHours = Math.max(Math.floor((campaignEndDate.getTime() - now.getTime()) / (1000 * 60 * 60)), 0); // Ensure non-negative hours
+
+     // Prepare the message content
+     const messageTemplate = (raisedAmount: number, inviteesCount: number, donorsCount: number) => `
+        Your Pass It Along Chain is expiring in ${remainingHours} hours.
+        You made a big difference. ${raisedAmount} raised!!
+        ${inviteesCount} Invitees, ${donorsCount} Donors.
+    `;
+
+     // Step 4: Send SMS to all valid phone numbers
+     await Promise.all(
+          validPhones.map(async (phone) => {
+               try {
+                    // Sending SMS with dynamic content
+                    await sendSMS(phone, messageTemplate(campaign.overall_raised, campaign.total_invitees, campaignHistories.length));
+               } catch (error) {
+                    console.error(`Error sending SMS to ${phone}:`, error);
+                    // Optionally, you could log the error or handle it based on your needs
+               }
+          }),
+     );
+
+     // Step 5: Log the campaign history for debugging
+     console.log('Campaign history:', campaignHistories);
+};
+
 export const campaignService = {
      createCampaign,
      getAllCampaigns,
@@ -193,4 +317,5 @@ export const campaignService = {
      hardDeleteCampaign,
      getCampaignById,
      invitePeopleToCampaign,
+     alertAboutCampaign,
 };

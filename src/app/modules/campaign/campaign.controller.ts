@@ -97,6 +97,19 @@ const invitePeopleToCampaign = catchAsync(async (req: Request, res: Response) =>
      });
 });
 
+const alertAboutCampaign = catchAsync(async (req: Request, res: Response) => {
+     const { campaignId } = req.params;
+
+     const result = await campaignService.alertAboutCampaign(req.body, campaignId);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Alert set successfully',
+          data: result,
+     });
+});
+
 export const campaignController = {
      createCampaign,
      getAllCampaigns,
@@ -106,4 +119,5 @@ export const campaignController = {
      hardDeleteCampaign,
      getCampaignById,
      invitePeopleToCampaign,
+     alertAboutCampaign,
 };

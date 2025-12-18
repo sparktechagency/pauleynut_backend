@@ -39,8 +39,38 @@ const updateContent = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+// Get time-range-based statistics
+const getTimeRangeStats = catchAsync(async (req: Request, res: Response) => {
+     const { startDate, endDate } = req.query;
+
+     const result = await ContentService.getTimeRangeStats(startDate as string | undefined, endDate as string | undefined);
+
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: 'Time range statistics retrieved successfully',
+          data: result,
+     });
+});
+
+// Get donation growth data
+const getDonationGrowthData = catchAsync(async (req: Request, res: Response) => {
+     const { startDate, endDate } = req.query;
+
+     const result = await ContentService.getDonationGrowthData(startDate as string | undefined, endDate as string | undefined);
+
+     sendResponse(res, {
+          statusCode: StatusCodes.OK,
+          success: true,
+          message: 'Donation growth data retrieved successfully',
+          data: result,
+     });
+});
+
 export const ContentController = {
      createContent,
      getContent,
      updateContent,
+     getTimeRangeStats,
+     getDonationGrowthData,
 };

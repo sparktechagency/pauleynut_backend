@@ -1,4 +1,11 @@
 import { z } from 'zod';
+import { progressAlertDayEnum, progressAlertFrequeincyEnum } from './content.enum';
+import { query } from 'winston';
+
+const timeRangeSchema = z.object({
+     startDate: z.string().datetime().optional(),
+     endDate: z.string().datetime().optional(),
+});
 
 const founderSchema = z.object({
      name: z.string({ required_error: 'Founder name is required' }),
@@ -8,10 +15,14 @@ const founderSchema = z.object({
 });
 
 const userLevelStrategySchema = z.object({
-     level: z.number({ required_error: 'Level is required' }).int().positive(),
+     level: z.string({ required_error: 'Level is required' }),
      title: z.string({ required_error: 'Title is required' }),
      description: z.string({ required_error: 'Description is required' }),
      benefits: z.array(z.string()).min(1, 'At least one benefit is required').optional(),
+
+     targetInvitation: z.number({ required_error: 'Target invitation is required' }).int().min(0),
+     targetDonation: z.number({ required_error: 'Target donation is required' }).min(0),
+     targetRaising: z.number({ required_error: 'Target raising is required' }).min(0),
 });
 
 const privacyPolicySchema = z.object({
@@ -44,6 +55,15 @@ export const createContentValidation = z.object({
           // User Level Strategy
           userLevelStrategy: z.array(userLevelStrategySchema).min(1, 'At least one user level strategy is required'),
 
+          notificationStrategy: z.object({
+               campaignExpiredAlert: z.boolean(),
+               lowProgressWarning: z.boolean(),
+               mileStoneAlert: z.boolean(),
+               mileStoneAlertMessage: z.string(),
+               weeklyProgressAlert: z.boolean(),
+               weeklyProgressAlertMessage: z.string(),
+          }),
+
           // Media
           gallery: z.array(z.string().url('Invalid image URL')).optional(),
 
@@ -73,6 +93,17 @@ export const updateContentValidation = z.object({
           // User Level Strategy
           userLevelStrategy: z.array(userLevelStrategySchema).min(1, 'At least one user level strategy is required').optional(),
 
+          notificationStrategy: z
+               .object({
+                    campaignExpiredAlert: z.boolean().optional(),
+                    lowProgressWarning: z.boolean().optional(),
+                    mileStoneAlert: z.boolean().optional(),
+                    mileStoneAlertMessage: z.string().optional(),
+                    weeklyProgressAlert: z.boolean().optional(),
+                    weeklyProgressAlertMessage: z.string().optional(),
+               })
+               .optional(),
+
           // Media
           gallery: z.array(z.string().url('Invalid image URL')).optional(),
 
@@ -81,7 +112,36 @@ export const updateContentValidation = z.object({
      }),
 });
 
+// Time range query schema for API requests
+export const timeRangeQuerySchema = z.object({
+     query: z
+          .object({
+               endDate: z.string(),
+               startDate: z.string(),
+          })
+          .superRefine(async (data, ctx) => {
+               const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+               if (!datePattern.test(data.startDate)) {
+                    ctx.addIssue({
+                         path: ['startDate'],
+                         message: 'Start date should be in format yyyy-mm-dd',
+                         code: z.ZodIssueCode.custom,
+                    });
+               }
+               if (!datePattern.test(data.endDate)) {
+                    ctx.addIssue({
+                         path: ['endDate'],
+                         message: 'End date should be in format yyyy-mm-dd',
+                         code: z.ZodIssueCode.custom,
+                    });
+               }
+          }),
+});
+
+// Export all validations
 export const ContentValidation = {
      createContentValidation,
      updateContentValidation,
+     timeRangeSchema,
+     timeRangeQuerySchema,
 };
