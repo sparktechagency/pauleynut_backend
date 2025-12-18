@@ -16,7 +16,8 @@ const sendSMS = async (to: string, message: string) => {
                message: `Message sent successfully to ${to}`,
           };
      } catch (error) {
-          throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to send sms');
+          console.log('🚀 ~ sendSMS ~ error:', to, error);
+          // throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Failed to send sms');
      }
 };
 

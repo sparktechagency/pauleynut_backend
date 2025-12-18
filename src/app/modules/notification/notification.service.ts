@@ -39,7 +39,7 @@ const adminNotificationFromDB = async () => {
 
 // read notifications only for admin
 const adminReadNotificationToDB = async (): Promise<INotification | null> => {
-     const result: any = await Notification.updateMany({ type: 'ADMIN', read: false }, { $set: { read: true } }, { new: true });
+     const result: any = await Notification.updateMany({ type: 'ADMIN', read: false }, { $set: { read: true } });
      return result;
 };
 const adminSendNotificationFromDB = async (payload: any) => {

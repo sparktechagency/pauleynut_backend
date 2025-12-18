@@ -1,6 +1,8 @@
 export type IVerifyContact = {
-     contact: string;
+     contact?: string;
+     email?: string;
      oneTimeCode: number;
+     isForLogin: boolean;
 };
 
 export type ILoginData = {

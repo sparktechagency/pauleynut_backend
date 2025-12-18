@@ -10,7 +10,7 @@ router.post('/login', validateRequest(AuthValidation.createLoginZodSchema), Auth
 router.post('/refresh-token', AuthController.refreshToken);
 router.post('/forget-password', validateRequest(AuthValidation.createForgetPasswordZodSchema), AuthController.forgetPassword);
 
-router.post('/verify-contact', validateRequest(AuthValidation.createVerifyContactZodSchema), AuthController.verifyContact);
+router.post('/verify-otp', validateRequest(AuthValidation.createVerifyContactZodSchema), AuthController.verifyContact);
 
 router.post('/reset-password', validateRequest(AuthValidation.createResetPasswordZodSchema), AuthController.resetPassword);
 router.post('/dashboard/forget-password', validateRequest(AuthValidation.createForgetPasswordZodSchema), AuthController.forgetPasswordByUrl);

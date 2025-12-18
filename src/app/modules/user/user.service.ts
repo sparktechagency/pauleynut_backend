@@ -61,7 +61,7 @@ const createAdminToDB = async (payload: Partial<IUser>): Promise<IUser> => {
      }
 
      //send email
-     const otp = generateOTP(6);
+     const otp = generateOTP(4);
      const values = {
           name: createAdmin.name,
           otp: otp,
@@ -99,7 +99,7 @@ const updateProfileToDB = async (user: JwtPayload, payload: Partial<IUser>): Pro
      }
 
      //unlink file here
-     if (payload.image) {
+     if (payload.image && isExistUser.image) {
           unlinkFile(isExistUser.image);
      }
 

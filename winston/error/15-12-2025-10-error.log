@@ -1,7 +1,0 @@
-Mon Dec 15 2025 10:16:48 [SERVER-NAME] error: 10.10.7.103 - GET /favicon.ico 404 - 0.915 ms
-Mon Dec 15 2025 10:17:24 [SERVER-NAME] error: 10.10.7.103 - GET /favicon.ico 404 - 0.842 ms
-Mon Dec 15 2025 10:17:50 [SERVER-NAME] error: [31mDatabase connection error[39m getaddrinfo EAI_AGAIN monog-local
-Mon Dec 15 2025 10:18:21 [SERVER-NAME] error: [31mDatabase connection error[39m getaddrinfo EAI_AGAIN mongo-db-template
-Mon Dec 15 2025 10:19:20 [SERVER-NAME] error: [31mDatabase connection error[39m getaddrinfo EAI_AGAIN mongo-latest
-Mon Dec 15 2025 10:22:45 [SERVER-NAME] error: [31mDatabase connection error[39m getaddrinfo EAI_AGAIN mongo
-Mon Dec 15 2025 10:23:32 [SERVER-NAME] error: [31mDatabase connection error[39m getaddrinfo EAI_AGAIN mongo-latest
