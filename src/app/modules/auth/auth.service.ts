@@ -25,7 +25,6 @@ const loginUserFromDB = async (payload: ILoginData) => {
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
      }
 
-
      // Handle OAuth users (they don't have passwords)
      if (isExistUser.oauthProvider) {
           throw new AppError(StatusCodes.BAD_REQUEST, `This account was created using ${isExistUser.oauthProvider}. Please use the ${isExistUser.oauthProvider} login option.`);
@@ -70,20 +69,24 @@ const loginUserFromDB = async (payload: ILoginData) => {
 
 //forget password
 const forgetPasswordToDB = async (email: string) => {
-     const isExistUser = await User.isExistUserByEmail(email);
-     if (!isExistUser) {
-          throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist*!");
+     try {
+          const isExistUser = await User.isExistUserByEmail(email);
+          if (!isExistUser) {
+               throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist*!");
+          }
+
+          //send mail
+          const otp = generateOTP(4);
+          const value = { otp, email: isExistUser.email };
+          const forgetPassword = emailTemplate.resetPassword(value);
+          emailHelper.sendEmail(forgetPassword);
+
+          //save to DB
+          const authentication = { oneTimeCode: otp, expireAt: new Date(Date.now() + 3 * 60000) };
+          await User.findOneAndUpdate({ email }, { $set: { authentication } });
+     } catch (error) {
+          console.log('🚀 ~ forgetPasswordToDB ~ error:', error);
      }
-
-     //send mail
-     const otp = generateOTP(4);
-     const value = { otp, email: isExistUser.email };
-     const forgetPassword = emailTemplate.resetPassword(value);
-     emailHelper.sendEmail(forgetPassword);
-
-     //save to DB
-     const authentication = { oneTimeCode: otp, expireAt: new Date(Date.now() + 3 * 60000) };
-     await User.findOneAndUpdate({ email }, { $set: { authentication } });
 };
 // resend otp
 const resendOtpFromDb = async (contact: string) => {
