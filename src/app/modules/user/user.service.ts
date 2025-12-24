@@ -26,22 +26,23 @@ const createUserToDB = async (payload: { name: string; contact: string; role: US
      const user = await User.isExistUserByContact(payload.contact);
      try {
           let createUser;
-          if (user) {
-               createUser = await User.findOneAndUpdate({ contact: payload.contact }, { $set: { ...createUserDto } }, { session });
+
+          if (!user) {
+               [createUser] = await User.create([createUserDto], { session });
           } else {
-               createUser = await User.create([createUserDto], { session });
+               createUser = await User.findOneAndUpdate({ _id: user._id }, { $set: { authentication } }, { new: true });
           }
           if (!createUser) {
                throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create user');
           }
 
           // send sms for otp
-          // await sendSMS(createUser.contact!, `Your OTP is ${otp}`); // ✏️
+          // await sendSMS(createUser.contact!, `Your OTP is ${otp}`); // ⬅️
 
           // Commit the transaction
           await session.commitTransaction();
           session.endSession();
-          // delete createUser.authentication; // ✏️
+          // delete createUser.authentication; // ⬅️
           return createUser;
      } catch (error) {
           console.log('🚀 ~ createUserToDB ~ error:', error);

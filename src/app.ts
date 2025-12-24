@@ -22,7 +22,7 @@ app.use(Morgan.errorHandler);
 //body parser
 app.use(
      cors({
-          origin: config.allowed_origins || '*',
+          origin: '*',
           credentials: true,
      }),
 );

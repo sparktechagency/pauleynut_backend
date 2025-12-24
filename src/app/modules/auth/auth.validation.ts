@@ -65,7 +65,8 @@ const createChangePasswordZodSchema = z.object({
 
 const createResendOtpZodSchema = z.object({
      body: z.object({
-          contact: z.string({ required_error: 'Email is required' }),
+          contact: z.string().optional(),
+          email: z.string().optional(),
      }),
 });
 

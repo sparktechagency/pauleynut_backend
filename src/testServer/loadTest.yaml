@@ -1,5 +1,5 @@
 config:
-     target: 'http://10.10.7.103:7005'
+     target: 'http://10.10.7.65:7005'
      phases:
           - duration: 60 # running 1 minute
             arrivalRate: 5000 # new request per 20 seconds
