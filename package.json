@@ -11,7 +11,7 @@
           "format": "prettier . --write",
           "seed": "ts-node src/seed/seedAdmin.ts",
           "build": "tsc",
-          "start": "node dist/server.ts"
+          "start": "node dist/server.js"
      },
      "keywords": [],
      "author": "",
