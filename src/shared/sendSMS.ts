@@ -74,12 +74,12 @@ const sendSMS = async (to: string, message: string) => {
           });
           console.log('🚀 ~ sendSMS ~ twilioSendSmsResult:', twilioSendSmsResult);
 
-          // // wait a bit, then check delivery
-          // setTimeout(async () => {
-          //      const msg = await twilioClient.messages(twilioSendSmsResult.sid).fetch();
-          //      console.log('Delivery status:', msg.status);
-          //      console.log('Error:', msg.errorCode, msg.errorMessage);
-          // }, 5000);
+          // wait a bit, then check delivery
+          setTimeout(async () => {
+               const msg = await twilioClient.messages(twilioSendSmsResult.sid).fetch();
+               console.log('Delivery status:', msg.status);
+               console.log('Error:', msg.errorCode, msg.errorMessage);
+          }, 5000);
 
           return {
                invalid: false,
