@@ -35,7 +35,7 @@ export async function startServer() {
           httpServer.headersTimeout = 60000;
 
           // Start HTTP server
-          httpServer.listen(httpPort, ipAddress, () => {
+          httpServer.listen(httpPort, '0.0.0.0', () => {
                logger.info(colors.bgCyan(`♻️  Application listening on http://${ipAddress}:${httpPort}`));
           });
 
