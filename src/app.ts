@@ -22,7 +22,8 @@ app.use(Morgan.errorHandler);
 //body parser
 app.use(
      cors({
-          origin: '*',
+          // origin: '*',
+          origin: ['http://10.10.7.79:3001', 'http://10.10.7.37:3002', 'https://dashboard.gopassit.org', 'https://api.gopassit.org'],
           credentials: true,
      }),
 );
