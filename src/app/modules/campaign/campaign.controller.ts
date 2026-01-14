@@ -84,6 +84,18 @@ const getCampaignById = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+const getCauseOfCampaignById = catchAsync(async (req: Request, res: Response) => {
+     const { id } = req.params;
+     const result = await campaignService.getCauseOfCampaignById(id);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Campaign retrieved successfully',
+          data: result,
+     });
+});
+
 const invitePeopleToCampaign = catchAsync(async (req: Request, res: Response) => {
      const { campaignId } = req.params;
 
@@ -118,6 +130,7 @@ export const campaignController = {
      deleteCampaign,
      hardDeleteCampaign,
      getCampaignById,
+     getCauseOfCampaignById,
      invitePeopleToCampaign,
      alertAboutCampaign,
 };

@@ -41,6 +41,7 @@ router.post(
      campaignController.alertAboutCampaign,
 );
 
+router.get('/cause/:id', campaignController.getCauseOfCampaignById);
 router.patch(
      '/:id',
      fileUploadHandler(),

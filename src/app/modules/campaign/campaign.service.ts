@@ -141,10 +141,7 @@ const getCampaignById = async (id: string) => {
      const totalDoners = await Transaction.countDocuments({ campaignId: id });
 
      // Sum total donated amount
-     const totalDonatedAgg = await Transaction.aggregate([
-          { $match: { campaignId: campaign._id } },
-          { $group: { _id: null, total: { $sum: '$amountPaid' } } }
-     ]);
+     const totalDonatedAgg = await Transaction.aggregate([{ $match: { campaignId: campaign._id } }, { $group: { _id: null, total: { $sum: '$amountPaid' } } }]);
      const totalDonated = totalDonatedAgg[0]?.total || 0;
 
      const newFunds = totalDonated - (campaign.overall_raised || 0);
@@ -160,7 +157,7 @@ const getCampaignById = async (id: string) => {
           return {
                totalInvited,
                totalDoners,
-               newFunds
+               newFunds,
           };
      }
 
@@ -170,11 +167,50 @@ const getCampaignById = async (id: string) => {
           totalInvited,
           totalDoners,
           totalDonated,
-          newFunds
+          newFunds,
      };
 };
 
+const getCauseOfCampaignById = async (id: string) => {
+     const now = new Date();
+     const campaign = await Campaign.findById(id).select('established network missionSummary about citiesServed yearsOfOperation survivorsSupported totalInvitees images');
+     if (!campaign) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found.');
+     }
 
+     const totalInvited = await InvitationHistory.countDocuments({ campaignId: id });
+     const totalDoners = await Transaction.countDocuments({ campaignId: id });
+
+     // Sum total donated amount
+     const totalDonatedAgg = await Transaction.aggregate([{ $match: { campaignId: campaign._id } }, { $group: { _id: null, total: { $sum: '$amountPaid' } } }]);
+     const totalDonated = totalDonatedAgg[0]?.total || 0;
+
+     const newFunds = totalDonated - (campaign.overall_raised || 0);
+
+     // Check if campaign expired
+     if (campaign.endDate < now) {
+          if (campaign.campaignStatus !== CampaignStatus.EXPIRED) {
+               campaign.campaignStatus = CampaignStatus.EXPIRED;
+               await campaign.save();
+          }
+
+          // Only return 3 values for expired campaign
+          return {
+               totalInvited,
+               totalDoners,
+               newFunds,
+          };
+     }
+
+     // If not expired, return full campaign data
+     return {
+          ...campaign.toObject(),
+          totalInvited,
+          totalDoners,
+          totalDonated,
+          newFunds,
+     };
+};
 
 const invitePeopleToCampaign = async (
      payload: { myInvitees: { invitationForPhone: string; invitationForName?: string }[]; donationAmount?: number; paymentMethod?: string; invitationIrecievedFrom: string }, // totalRaised+
@@ -392,6 +428,7 @@ export const campaignService = {
      deleteCampaign,
      hardDeleteCampaign,
      getCampaignById,
+     getCauseOfCampaignById,
      invitePeopleToCampaign,
      alertAboutCampaign,
 };
