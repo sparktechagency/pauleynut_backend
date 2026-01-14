@@ -81,8 +81,19 @@ export interface ICampaign extends Document {
      cause_image: string;
 
      // ✅ Add these missing fields
-     currentAmount: number;  // or overall_raised alias
-     goalAmount: number;     // or targetAmount alias
+     currentAmount: number; // or overall_raised alias
+     goalAmount: number; // or targetAmount alias
+
+     //
+     established?: string;
+     network?: string;
+     missionSummary?: string;
+     about?: string;
+     citiesServed?: number;
+     yearsOfOperation?: number;
+     survivorsSupported?: number;
+     totalInvitees?: number;
+     images?: string[];
 
      createdAt: Date;
      updatedAt: Date;

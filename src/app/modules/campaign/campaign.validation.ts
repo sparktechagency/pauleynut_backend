@@ -34,6 +34,16 @@ const commonFields = {
      cause_image: z.string().url('Invalid image URL').or(z.literal('')).optional(),
      alert: z.string().optional(),
      message: z.string().optional(),
+
+     established: z.string().optional(),
+     network: z.string().optional(),
+     missionSummary: z.string().optional(),
+     about: z.string().optional(),
+     citiesServed: z.number().optional(),
+     yearsOfOperation: z.number().optional(),
+     survivorsSupported: z.number().optional(),
+     totalInvitees: z.number().optional(),
+     images: z.string().optional(),
 };
 
 const createCampaignZodSchema = z.object({

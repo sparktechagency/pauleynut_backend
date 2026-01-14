@@ -11,7 +11,7 @@ const parseMultipleFileData = (fieldName: IFolderName) => {
                     const data = JSON.parse(req.body.data);
                     req.body = { [fieldName]: filePath, ...data };
                } else {
-                    req.body = { [fieldName]: filePath };
+                    req.body = { ...req.body, [fieldName]: filePath };
                }
 
                next();

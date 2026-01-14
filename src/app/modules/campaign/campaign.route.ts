@@ -7,6 +7,7 @@ import parseFileData from '../../middleware/parseFileData';
 import { FOLDER_NAMES } from '../../../enums/files';
 import validateRequest from '../../middleware/validateRequest';
 import { campaignValidation } from './campaign.validation';
+import parseMultipleFileData from '../../middleware/parseMultipleFiledata';
 
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router.post(
      auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
      fileUploadHandler(),
      parseFileData(FOLDER_NAMES.IMAGE),
+     parseMultipleFileData(FOLDER_NAMES.IMAGES),
      validateRequest(campaignValidation.createCampaignZodSchema),
      campaignController.createCampaign,
 );
@@ -49,6 +51,5 @@ router.patch(
 );
 router.get('/:id', campaignController.getCampaignById);
 router.delete('/:id', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), campaignController.deleteCampaign);
-
 
 export const campaignRoutes = router;

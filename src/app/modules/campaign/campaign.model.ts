@@ -40,6 +40,16 @@ const CampaignSchema = new Schema<ICampaign>(
           isDeleted: { type: Boolean, default: false },
           milestoneNotified: { type: Boolean, default: false },
           deletedAt: { type: Date },
+
+          established: { type: String },
+          network: { type: String },
+          missionSummary: { type: String },
+          about: { type: String },
+          citiesServed: { type: Number },
+          yearsOfOperation: { type: Number },
+          survivorsSupported: { type: Number },
+          totalInvitees: { type: Number },
+          images: { type: [String] },
      },
      { timestamps: true },
 );
