@@ -15,7 +15,7 @@ router.post(
      '/',
      auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
      fileUploadHandler(),
-     parseFileData(FOLDER_NAMES.IMAGE),
+     // parseFileData(FOLDER_NAMES.IMAGE),
      parseMultipleFileData(FOLDER_NAMES.IMAGES),
      validateRequest(campaignValidation.createCampaignZodSchema),
      campaignController.createCampaign,

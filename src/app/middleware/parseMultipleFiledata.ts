@@ -9,7 +9,7 @@ const parseMultipleFileData = (fieldName: IFolderName) => {
                // Handle additional data if present
                if (req.body.data) {
                     const data = JSON.parse(req.body.data);
-                    req.body = { [fieldName]: filePath, ...data };
+                    req.body = { ...req.body, [fieldName]: filePath };
                } else {
                     req.body = { ...req.body, [fieldName]: filePath };
                }
