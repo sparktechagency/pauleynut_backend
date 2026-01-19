@@ -62,7 +62,7 @@ const updateCampaign = async (id: string, payload: Partial<ICampaign & { image?:
      // }
 
      if (payload.images && isExist.images) {
-          payload.images.forEach((image) => {
+          isExist.images.forEach((image) => {
                unlinkFile(image);
           });
      }
