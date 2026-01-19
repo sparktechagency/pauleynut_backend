@@ -14,7 +14,7 @@ const CampaignSchema = new Schema<ICampaign>(
           address: { type: String },
           donor_name: { type: String },
           dafPartner: { type: String },
-          internalTrackingId: { type: String, unique: true, sparse: true, required: false },
+          internalTrackingId: { type: String, sparse: true, required: false },
           campaignStatus: {
                type: String,
                enum: Object.values(CampaignStatus),
