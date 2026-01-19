@@ -45,7 +45,7 @@ router.get('/cause/:id', campaignController.getCauseOfCampaignById);
 router.patch(
      '/:id',
      fileUploadHandler(),
-     parseFileData(FOLDER_NAMES.IMAGE),
+     parseMultipleFileData(FOLDER_NAMES.IMAGES),
      auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN),
      // validateRequest(campaignValidation.updateCampaignZodSchema),
      campaignController.updateCampaign,
