@@ -35,6 +35,7 @@ app.use(
                'https://gopassit.org',
                'https://api.gopassit.org',
                'https://mobile-view-website-liard.vercel.app',
+               'https://moblie-view-website-dashboard.vercel.app',
           ],
           credentials: true,
      }),
