@@ -1,5 +1,6 @@
 import express from 'express';
 import { UserRouter } from '../app/modules/user/user.route';
+import { UserLevelRouter } from '../app/modules/user/userLevel.routes';
 import { AuthRouter } from '../app/modules/auth/auth.route';
 import { campaignRoutes } from '../app/modules/campaign/campaign.route';
 import { ContentRoutes } from '../app/modules/content/content.routes';
@@ -17,6 +18,10 @@ const routes = [
      {
           path: '/users',
           route: UserRouter,
+     },
+     {
+          path: '/users/level',
+          route: UserLevelRouter,
      },
      {
           path: '/campaign',
@@ -41,7 +46,7 @@ const routes = [
      {
           path: '/privacy-policy',
           route: PrivacyPolicyRouter,
-     }
+     },
 ];
 
 routes.forEach((element) => {

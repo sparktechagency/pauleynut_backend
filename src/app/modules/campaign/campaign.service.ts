@@ -308,39 +308,39 @@ const invitePeopleToCampaign = async (
                     { session },
                );
 
-               // level up the donor
-               const userLevelStrategy = await ContentService.getUserLevelStrategies();
+               // // level up the donor
+               // const userLevelStrategy = await ContentService.getUserLevelStrategies();
 
-               if (userLevelStrategy && Array.isArray(userLevelStrategy) && userLevelStrategy.length > 0) {
-                    const userTotalRaised = isExitUser.totalRaised || 0;
-                    const userTotalDonated = isExitUser.totalDonated || 0;
-                    const userTotalInvited = isExitUser.totalInvited || 0;
+               // if (userLevelStrategy && Array.isArray(userLevelStrategy) && userLevelStrategy.length > 0) {
+               //      const userTotalRaised = isExitUser.totalRaised || 0;
+               //      const userTotalDonated = isExitUser.totalDonated || 0;
+               //      const userTotalInvited = isExitUser.totalInvited || 0;
 
-                    // Find the appropriate level based on total raised, donated, and invited
-                    const userLevelTobeUpdatedTo = userLevelStrategy.find(
-                         (strategy: UserLevelStrategy) => userTotalRaised >= strategy?.targetRaising && userTotalDonated >= strategy?.targetDonation && userTotalInvited >= strategy?.targetInvitation,
-                    );
+               //      // Find the appropriate level based on total raised, donated, and invited
+               //      const userLevelTobeUpdatedTo = userLevelStrategy.find(
+               //           (strategy: UserLevelStrategy) => userTotalRaised >= strategy?.targetRaising && userTotalDonated >= strategy?.targetDonation && userTotalInvited >= strategy?.targetInvitation,
+               //      );
 
-                    if (userLevelTobeUpdatedTo) {
-                         await User.updateOne({ _id: isExitUser._id }, { userLevel: userLevelTobeUpdatedTo.level }, { session });
-                    }
+               //      if (userLevelTobeUpdatedTo) {
+               //           await User.updateOne({ _id: isExitUser._id }, { userLevel: userLevelTobeUpdatedTo.level }, { session });
+               //      }
 
-                    const invitorTotalRaised = isExistInvitorUser.totalRaised || 0;
-                    const invitorTotalDonated = isExistInvitorUser.totalDonated || 0;
-                    const invitorTotalInvited = isExistInvitorUser.totalInvited || 0;
+               //      const invitorTotalRaised = isExistInvitorUser.totalRaised || 0;
+               //      const invitorTotalDonated = isExistInvitorUser.totalDonated || 0;
+               //      const invitorTotalInvited = isExistInvitorUser.totalInvited || 0;
 
-                    // Find the appropriate level for the invitor
-                    const invitorLevelTobeUpdatedTo = userLevelStrategy.find(
-                         (strategy: UserLevelStrategy) =>
-                              invitorTotalRaised >= strategy?.targetRaising && invitorTotalDonated >= strategy?.targetDonation && invitorTotalInvited >= strategy?.targetInvitation,
-                    );
+               //      // Find the appropriate level for the invitor
+               //      const invitorLevelTobeUpdatedTo = userLevelStrategy.find(
+               //           (strategy: UserLevelStrategy) =>
+               //                invitorTotalRaised >= strategy?.targetRaising && invitorTotalDonated >= strategy?.targetDonation && invitorTotalInvited >= strategy?.targetInvitation,
+               //      );
 
-                    if (invitorLevelTobeUpdatedTo) {
-                         await User.updateOne({ _id: isExistInvitorUser._id }, { userLevel: invitorLevelTobeUpdatedTo.level }, { session });
-                    }
-               } else {
-                    console.log('or strategy is empty');
-               }
+               //      if (invitorLevelTobeUpdatedTo) {
+               //           await User.updateOne({ _id: isExistInvitorUser._id }, { userLevel: invitorLevelTobeUpdatedTo.level }, { session });
+               //      }
+               // } else {
+               //      console.log('or strategy is empty');
+               // }
           }
 
           // Commit the transaction if everything is successful
