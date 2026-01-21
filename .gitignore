@@ -1,0 +1,7 @@
+node_modules
+dist
+coverage
+uploads
+winston/error/*
+winston/success/*
+settings.json

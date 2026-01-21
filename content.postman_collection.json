@@ -1,0 +1,85 @@
+{
+  "info": {
+    "name": "Content Management API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Content",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n            \"appName\": \"Refuge for Women\",\n            \"logo\": \"https://example.com/logo.png\",\n            \"founders\": [\n              {\n                \"name\": \"John Doe\",\n                \"role\": \"CEO\",\n                \"bio\": \"Founder and CEO with 10+ years of experience\",\n                \"image\": \"https://example.com/john.jpg\"\n              }\n            ],\n            \"ourMission\": \"To provide support and resources for women in need\",\n            \"howWeOperate\": \"We operate through a network of volunteers and professionals\",\n            \"aboutRefugeForWomen\": \"A safe haven for women seeking help and support\",\n            \"introduction\": \"Welcome to our platform dedicated to supporting women\",\n            \"citiesServed\": 15,\n            \"yearsOfOperation\": 5,\n            \"survivorsSupported\": 1000,\n            \"userLevelStrategy\": [\n              {\n                \"level\": 1,\n                \"title\": \"Starter\",\n                \"description\": \"Basic access level\",\n                \"benefits\": [\"Access to basic resources\"]\n              }\n            ],\n            \"gallery\": [\"https://example.com/image1.jpg\"],\n            \"privacyPolicy\": {\n              \"whatWeCollect\": \"Basic user information\",\n              \"howWeUseIt\": \"To provide better services\",\n              \"yourAnonymity\": \"Your data is kept confidential\",\n              \"whoSeesYourInfo\": \"Only authorized personnel\",\n              \"security\": \"We use industry standard security measures\",\n              \"yourChoices\": \"You can request data deletion\"\n            }\n          }"
+        },
+        "url": {
+          "raw": "{{base_url}}/content",
+          "host": ["{{base_url}}"],
+          "path": ["content"]
+        }
+      }
+    },
+    {
+      "name": "Get Content",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/content",
+          "host": ["{{base_url}}"],
+          "path": ["content"]
+        }
+      }
+    },
+    {
+      "name": "Update Content",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{auth_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n            \"appName\": \"Refuge for Women - Updated\",\n            \"ourMission\": \"Updated mission statement\"\n          }"
+        },
+        "url": {
+          "raw": "{{base_url}}/content",
+          "host": ["{{base_url}}"],
+          "path": ["content"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api/v1"
+    },
+    {
+      "key": "auth_token",
+      "value": "your_auth_token_here"
+    }
+  ]
+}
