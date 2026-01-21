@@ -20,7 +20,7 @@ const routes = [
           route: UserRouter,
      },
      {
-          path: '/users/level',
+          path: '/users-level',
           route: UserLevelRouter,
      },
      {
