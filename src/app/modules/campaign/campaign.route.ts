@@ -25,6 +25,7 @@ router.get('/', campaignController.getAllCampaigns);
 
 router.get('/unpaginated', campaignController.getAllUnpaginatedCampaigns);
 
+router.get('/app/internalTrackingId/campaign/:id', campaignController.getCampaignInternalTrackingIdById);
 router.delete('/hard-delete/:id', auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN), campaignController.hardDeleteCampaign);
 
 router.post(

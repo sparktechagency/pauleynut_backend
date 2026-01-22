@@ -84,6 +84,18 @@ const getCampaignById = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+const getCampaignInternalTrackingIdById = catchAsync(async (req: Request, res: Response) => {
+     const { id } = req.params;
+     const result = await campaignService.getCampaignInternalTrackingIdById(id);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Campaign retrieved successfully',
+          data: result,
+     });
+});
+
 const getCauseOfCampaignById = catchAsync(async (req: Request, res: Response) => {
      const { id } = req.params;
      const result = await campaignService.getCauseOfCampaignById(id);
@@ -133,4 +145,5 @@ export const campaignController = {
      getCauseOfCampaignById,
      invitePeopleToCampaign,
      alertAboutCampaign,
+     getCampaignInternalTrackingIdById,
 };

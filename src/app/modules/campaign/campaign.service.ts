@@ -184,6 +184,16 @@ const getCampaignById = async (id: string) => {
      };
 };
 
+const getCampaignInternalTrackingIdById = async (id: string) => {
+     const now = new Date();
+     const campaign = await Campaign.findById(id).select('internalTrackingId');
+     if (!campaign) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found.');
+     }
+
+     return campaign.internalTrackingId;
+};
+
 const getCauseOfCampaignById = async (id: string) => {
      const now = new Date();
      const campaign = await Campaign.findById(id).select(
@@ -443,6 +453,7 @@ export const campaignService = {
      deleteCampaign,
      hardDeleteCampaign,
      getCampaignById,
+     getCampaignInternalTrackingIdById,
      getCauseOfCampaignById,
      invitePeopleToCampaign,
      alertAboutCampaign,
