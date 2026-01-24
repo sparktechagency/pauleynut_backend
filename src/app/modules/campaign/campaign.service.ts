@@ -20,21 +20,73 @@ import { INotification } from '../notification/notification.interface';
 import { IUser } from '../user/user.interface';
 import { CampaignStatus } from './campaign.enum';
 import { ContentService } from '../content/content.service';
+import { ReferralModel } from '../Referral/Referral.Model';
 
-const createCampaign = async (payload: ICampaign & { image?: string }, user: any): Promise<ICampaign> => {
-     const createCampaignDto = {
-          ...payload,
-          // cause_image: payload.image,
-          createdBy: new mongoose.Types.ObjectId(user.id),
-     };
-     const result = await Campaign.create(createCampaignDto);
-     if (!result) {
+const createCampaign = async (
+     payload: ICampaign & { image?: string; phone: string }, // phone mandatory for admin/root
+     user: any,
+): Promise<ICampaign> => {
+     const session = await mongoose.startSession();
+
+     try {
+          session.startTransaction();
+
+          // 1. Campaign তৈরি
+          const campaignDoc = await Campaign.create(
+               [
+                    {
+                         ...payload,
+                         createdBy: new mongoose.Types.ObjectId(user.id),
+                         adminId: new mongoose.Types.ObjectId(user.id),
+                         // cause_image: payload.image,   // যদি ফিল্ডের নাম এমন হয়
+                    },
+               ],
+               { session },
+          );
+
+          const newCampaign = campaignDoc[0];
+
+          // 2. Root referral তৈরি (admin-এর phone দিয়ে)
+          const referralDoc = await ReferralModel.create(
+               [
+                    {
+                         campaignId: newCampaign._id,
+                         phone: user.contact, // অ্যাডমিনের ফোন নাম্বার (mandatory)
+                         parentPhone: null, // root node
+                         donationAmount: 0,
+                         invitedPhones: [],
+                    },
+               ],
+               { session },
+          );
+
+          const rootReferral = referralDoc[0];
+
+          // 3. যদি চাও campaign-এ root referral-এর reference রাখতে (optional)
+          newCampaign.referralId = rootReferral._id;
+          await newCampaign.save({ session });
+
+          // অথবা কোনো reference না রেখেও চলবে – কারণ tree phone দিয়ে traverse হবে
+
+          await session.commitTransaction();
+
+          return newCampaign;
+     } catch (error) {
+          await session.abortTransaction();
+
+          // Image cleanup যদি থাকে
           if (payload.image) {
-               unlinkFile(payload.image);
+               try {
+                    unlinkFile(payload.image);
+               } catch (unlinkErr) {
+                    console.error('Failed to unlink file:', unlinkErr);
+               }
           }
-          throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found.');
+
+          throw error; // AppError বা custom error throw করতে পারো
+     } finally {
+          session.endSession();
      }
-     return result;
 };
 
 const getAllCampaigns = async (query: Record<string, any>): Promise<{ meta: { total: number; page: number; limit: number }; result: ICampaign[] }> => {

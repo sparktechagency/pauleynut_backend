@@ -61,11 +61,10 @@ const loginUserFromDB = async (payload: ILoginData) => {
           throw new AppError(StatusCodes.BAD_REQUEST, 'Password is incorrect!');
      }
 
-     const jwtData = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email };
+     const jwtData = { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email, contact: isExistUser.contact };
      //create token
      const accessToken = jwtHelper.createToken(jwtData, config.jwt.jwt_secret as Secret, config.jwt.jwt_expire_in as string);
      const refreshToken = jwtHelper.createToken(jwtData, config.jwt.jwt_refresh_secret as string, config.jwt.jwt_refresh_expire_in as string);
-
 
      const campaign = await getCampaignId(isExistUser._id);
 
@@ -174,7 +173,6 @@ const forgetPasswordByUrlToDB = async (email: string) => {
      await emailHelper.sendEmail(forgetPasswordEmail);
 };
 
-
 const verifyContactToDB = async (payload: IVerifyContact) => {
      const { contact, oneTimeCode, email } = payload;
 
@@ -192,10 +190,7 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
 
      // Validate OTP
      if (!oneTimeCode) {
-          throw new AppError(
-               StatusCodes.BAD_REQUEST,
-               'Please provide the OTP. Check your email or contact for the code.'
-          );
+          throw new AppError(StatusCodes.BAD_REQUEST, 'Please provide the OTP. Check your email or contact for the code.');
      }
 
      if (isExistUser.authentication?.oneTimeCode !== oneTimeCode) {
@@ -208,8 +203,8 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
           await User.findByIdAndUpdate(isExistUser._id, {
                $set: {
                     'authentication.oneTimeCode': null,
-                    'authentication.expireAt': null
-               }
+                    'authentication.expireAt': null,
+               },
           });
           throw new AppError(StatusCodes.BAD_REQUEST, 'OTP has expired. Please request a new one.');
      }
@@ -231,10 +226,10 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
                          verified: true,
                          authentication: {
                               oneTimeCode: null,
-                              expireAt: null
+                              expireAt: null,
                          },
-                         $inc: { totalLogin: 1 }
-                    }
+                         $inc: { totalLogin: 1 },
+                    },
                );
           } else {
                await User.findOneAndUpdate(
@@ -243,9 +238,9 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
                          verified: true,
                          authentication: {
                               oneTimeCode: null,
-                              expireAt: null
-                         }
-                    }
+                              expireAt: null,
+                         },
+                    },
                );
           }
 
@@ -255,15 +250,13 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
                     id: isExistUser._id,
                     role: isExistUser.role,
                     email: isExistUser.email,
-                    contact: isExistUser.contact
+                    contact: isExistUser.contact,
                },
                config.jwt.jwt_secret as Secret,
                config.jwt.jwt_expire_in as string,
           );
 
-          message = payload.isForLogin
-               ? 'Login successful'
-               : 'Contact verification successful';
+          message = payload.isForLogin ? 'Login successful' : 'Contact verification successful';
 
           user = await User.findById(isExistUser._id);
 
@@ -274,7 +267,7 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
                isVerified: true,
                message,
                accessToken,
-               user // ✅ totalLogin included
+               user, // ✅ totalLogin included
           };
 
           if (campaign) {
@@ -282,7 +275,6 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
           }
 
           return response;
-
      } else {
           // Scenario 2: Password reset verification
           await User.findOneAndUpdate(
@@ -291,9 +283,9 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
                     authentication: {
                          isResetPassword: true,
                          oneTimeCode: null,
-                         expireAt: null
-                    }
-               }
+                         expireAt: null,
+                    },
+               },
           );
 
           // Create reset token
@@ -301,7 +293,7 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
           await ResetToken.create({
                user: isExistUser._id,
                token: createToken,
-               expireAt: new Date(Date.now() + 5 * 60000)
+               expireAt: new Date(Date.now() + 5 * 60000),
           });
 
           message = 'Verification successful. Please use this token to reset your password.';
@@ -310,7 +302,7 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
           return {
                isVerified: true,
                verifyToken,
-               message
+               message,
           };
      }
 };

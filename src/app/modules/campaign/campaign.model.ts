@@ -50,6 +50,8 @@ const CampaignSchema = new Schema<ICampaign>(
           survivorsSupported: { type: Number },
           totalInvitees: { type: Number },
           images: { type: [String] },
+          adminId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+          referralId: { type: Schema.Types.ObjectId, ref: 'Referral' },
      },
      { timestamps: true },
 );

@@ -8,6 +8,7 @@ import { DashboardRoutes } from '../app/modules/Dashboard/dashboard.route';
 import { TransactionRoutes } from '../app/modules/Transaction/Transaction.route';
 import { InvitationHistoryRoutes } from '../app/modules/InvitationHistory/InvitationHistory.route';
 import { PrivacyPolicyRouter } from '../app/modules/Settings/SettingRoute';
+import { referralRoutes } from '../app/modules/Referral/Referral.Routes';
 
 const router = express.Router();
 const routes = [
@@ -46,6 +47,10 @@ const routes = [
      {
           path: '/privacy-policy',
           route: PrivacyPolicyRouter,
+     },
+     {
+          path: '/referral',
+          route: referralRoutes,
      },
 ];
 

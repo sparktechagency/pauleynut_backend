@@ -100,6 +100,9 @@ export interface ICampaign extends Document {
      isDeleted: boolean;
      milestoneNotified: boolean;
      deletedAt?: Date;
+
+     adminId: Types.ObjectId;
+     referralId: Types.ObjectId;
 }
 
 export type ICampaignFilters = {
