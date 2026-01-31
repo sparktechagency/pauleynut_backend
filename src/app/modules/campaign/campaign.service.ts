@@ -26,6 +26,10 @@ const createCampaign = async (
      payload: ICampaign & { image?: string; phone: string }, // phone mandatory for admin/root
      user: any,
 ): Promise<ICampaign> => {
+     const userDetails = await User.findById(user.id);
+     if (!userDetails) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
+     }
      const session = await mongoose.startSession();
 
      try {
@@ -36,8 +40,8 @@ const createCampaign = async (
                [
                     {
                          ...payload,
-                         createdBy: new mongoose.Types.ObjectId(user.id),
-                         adminId: new mongoose.Types.ObjectId(user.id),
+                         createdBy: userDetails._id,
+                         adminId: userDetails._id,
                          // cause_image: payload.image,   // যদি ফিল্ডের নাম এমন হয়
                     },
                ],
@@ -51,7 +55,7 @@ const createCampaign = async (
                [
                     {
                          campaignId: newCampaign._id,
-                         phone: user.contact, // অ্যাডমিনের ফোন নাম্বার (mandatory)
+                         phone: userDetails.contact, // অ্যাডমিনের ফোন নাম্বার (mandatory)
                          parentPhone: null, // root node
                          donationAmount: 0,
                          invitedPhones: [],
