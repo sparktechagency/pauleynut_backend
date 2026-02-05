@@ -8,10 +8,10 @@ export class ReferralService {
           const parent = await ReferralModel.findOne({ campaignId, phone: parentPhone });
           if (!parent) throw new Error('Parent not found');
 
-          // 2. Max 12 invite চেক
-          if (parent.invitedPhones.length >= 12) {
-               throw new Error('Maximum 12 invites allowed per person');
-          }
+          // // 2. Max 12 invite চেক
+          // if (parent.invitedPhones.length >= 12) {
+          //      throw new Error('Maximum 12 invites allowed per person');
+          // }
 
           //   // 3. নতুন phone ইতিমধ্যে আছে কি না চেক
           //   const existing = await ReferralModel.findOne({ campaignId, phone: newPhone });
