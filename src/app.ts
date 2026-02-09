@@ -27,6 +27,7 @@ app.use(
                'http://10.10.7.79:3001',
                'http://localhost:3002',
                'http://localhost:3001',
+               'http://204.197.173.144:3002',
                'http://localhost:3000',
                'http://10.10.7.37:3002',
                'http://10.10.7.37:3000',
