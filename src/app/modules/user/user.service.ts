@@ -353,12 +353,27 @@ const unlinkOAuthAccount = async (userId: string, provider: 'google' | 'facebook
      return await User.findByIdAndUpdate(userId, updateData, { new: true });
 };
 
+const deleteUserFordatabase = async (contact: string, isDeleted: boolean) => {
+     const user = await User.findOne({ contact });
+     if (!user) {
+          throw new AppError(StatusCodes.NOT_FOUND, 'User not found');
+     }
+
+     if (isDeleted) {
+          await User.findByIdAndUpdate(user._id, { isDeleted: true }, { new: true });
+     } else {
+          await User.findByIdAndUpdate(user._id, { isDeleted: false }, { new: true });
+     }
+     return user;
+};
+
 export const UserService = {
      createUserToDB,
      getUserProfileFromDB,
      updateProfileToDB,
      createAdminToDB,
      deleteUser,
+     deleteUserFordatabase,
      verifyUserPassword,
      // New search and management methods
      findUserById,

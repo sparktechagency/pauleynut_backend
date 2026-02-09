@@ -315,12 +315,25 @@ const unlinkOAuthAccount = catchAsync(async (req, res) => {
      });
 });
 
+const deleteUser = catchAsync(async (req, res) => {
+     const { contact, isDeleted } = req.body
+     const result = await UserService.deleteUserFordatabase(contact, isDeleted);
+
+     sendResponse(res, {
+          success: true,
+          statusCode: StatusCodes.OK,
+          message: 'User deleted successfully',
+          data: result,
+     });
+});
+
 export const UserController = {
      createUser,
      getUserProfile,
      updateProfile,
      createAdmin,
      deleteProfile,
+     deleteUser,
      // New search and management methods
      findUserById,
      findUserByEmail,
