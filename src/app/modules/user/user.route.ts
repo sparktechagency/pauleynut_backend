@@ -21,7 +21,7 @@ router
      );
 
 router.route('/').post(validateRequest(UserValidation.createUserZodSchema), UserController.createUser);
-router.delete("/delete-user", UserController.deleteUser)
+router.delete("/delete-user", UserController.deleteUser) //DELETEuserbycontact
 
 
 // Admin routes for user management
