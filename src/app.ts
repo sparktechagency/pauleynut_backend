@@ -112,21 +112,6 @@ import passport from './config/passport';
 
 const app: Application = express();
 
-app.options('*', (req, res) => {
-  const origin = req.headers.origin;
-  
-  // Only allow your frontend
-  if (origin === 'https://dashboard.gopassit.org') {
-    res.header('Access-Control-Allow-Origin', origin);
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Requested-With');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.status(200).send();
-  } else {
-    res.status(403).send('Not allowed');
-  }
-});
-
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -138,19 +123,20 @@ app.use(Morgan.errorHandler);
 app.use(
   cors({
     origin: [
-               'http://10.10.7.79:3001',
-               'http://localhost:3002',
-               'http://204.197.173.144:3002',
-               'http://localhost:3000',
-               'https://dashboard.gopassit.org',
-               'https://www.gopassit.org',
-               'https://gopassit.org',
-               'https://api.gopassit.org'
-          ], // Just your frontend
+      'http://10.10.7.79:3001',
+      'http://localhost:3002',
+      'http://204.197.173.144:3002',
+      'http://localhost:3000',
+      'https://dashboard.gopassit.org',
+      'https://www.gopassit.org',
+      'https://gopassit.org',
+      'https://api.gopassit.org'
+    ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
   }),
 );
-
 // Body parser
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
