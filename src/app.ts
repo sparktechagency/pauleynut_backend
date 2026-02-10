@@ -23,6 +23,8 @@ app.use(Morgan.errorHandler);
 app.use(
      cors({
           origin: '*',
+          
+          credentials: true,
      }),
 );
 
