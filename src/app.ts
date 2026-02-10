@@ -112,6 +112,21 @@ import passport from './config/passport';
 
 const app: Application = express();
 
+app.options('*', (req, res) => {
+  const origin = req.headers.origin;
+  
+  // Only allow your frontend
+  if (origin === 'https://dashboard.gopassit.org') {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Requested-With');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.status(200).send();
+  } else {
+    res.status(403).send('Not allowed');
+  }
+});
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
