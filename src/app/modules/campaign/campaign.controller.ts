@@ -134,6 +134,18 @@ const alertAboutCampaign = catchAsync(async (req: Request, res: Response) => {
      });
 });
 
+const duplicateCampaignById = catchAsync(async (req: Request, res: Response) => {
+     const { id } = req.params;
+     const result = await campaignService.duplicateCampaignById(id);
+
+     sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: 'Campaign retrieved successfully',
+          data: result,
+     });
+});
+
 export const campaignController = {
      createCampaign,
      getAllCampaigns,
@@ -146,4 +158,5 @@ export const campaignController = {
      invitePeopleToCampaign,
      alertAboutCampaign,
      getCampaignInternalTrackingIdById,
+     duplicateCampaignById
 };

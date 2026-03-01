@@ -5,6 +5,7 @@ const createVerifyContactZodSchema = z.object({
           .object({
                contact: z.string().optional(),
                email: z.string().optional(),
+               campaignId: z.string(),
                oneTimeCode: z.number({ required_error: 'One time code is required' }),
                isForLogin: boolean({ required_error: 'Is for login is required' }),
           })

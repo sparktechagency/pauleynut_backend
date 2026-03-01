@@ -17,7 +17,7 @@ const verifyContact = catchAsync(async (req, res) => {
                verifyToken: result.verifyToken,
                accessToken: result.accessToken,
                isVerified: true, campaignId: result.campaignId,
-               totalLogin: result.user.totalLogin
+               loggedinCampaigns: result.user.loggedinCampaigns
           }
      });
 });

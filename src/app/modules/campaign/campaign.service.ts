@@ -501,6 +501,26 @@ const alertAboutCampaign = async (payload: Partial<ICampaign>, campaignId: strin
      console.log('Campaign history:', campaignHistories);
 };
 
+const duplicateCampaignById = async (id: string) => {
+   const campaign = await Campaign.findById(id).lean();
+
+   if (!campaign) {
+      throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found.');
+   }
+
+   // Remove unwanted fields
+   delete campaign._id;
+   delete campaign.createdAt;
+   delete campaign.updatedAt;
+
+   const duplicateCampaign = await Campaign.create({
+      ...campaign,
+      title: `${campaign.title} (Copy)` // optional rename
+   });
+
+   return duplicateCampaign;
+};
+
 export const campaignService = {
      createCampaign,
      getAllCampaigns,
@@ -513,4 +533,5 @@ export const campaignService = {
      getCauseOfCampaignById,
      invitePeopleToCampaign,
      alertAboutCampaign,
+     duplicateCampaignById
 };

@@ -111,10 +111,17 @@ const userSchema = new Schema<IUser, UserModel>(
                type: Number,
                default: 0,
           },
-          totalLogin: {
-               type: Number,
-               default: 0,
-          },
+          // totalLogin: {
+          //      type: Number,
+          //      default: 0,
+          // },
+          
+          loggedinCampaigns:[
+               {
+                    type: Schema.Types.ObjectId,
+                    ref: 'Campaign'
+               }
+          ],
      },
      { timestamps: true },
 );

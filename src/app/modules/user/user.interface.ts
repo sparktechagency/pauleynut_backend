@@ -1,6 +1,7 @@
 import { Model } from 'mongoose';
 import { USER_ROLES } from '../../../enums/user';
 import { UserLevel } from './user.enum';
+import { Types } from 'mongoose';
 export type IUser = {
      name: string;
      role: USER_ROLES;
@@ -24,7 +25,8 @@ export type IUser = {
      totalRaised: number;
      totalDonated: number;
      totalInvited: number;
-     totalLogin: number;
+     // totalLogin: number;
+     loggedinCampaigns: Types.ObjectId[];
      invitedBy?: string;
 };
 
