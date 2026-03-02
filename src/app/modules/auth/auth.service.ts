@@ -247,17 +247,17 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
           throw new AppError(StatusCodes.BAD_REQUEST, 'Invalid OTP provided!');
      }
 
-     // Check OTP expiration
-     const currentDate = new Date();
-     if (!isExistUser.authentication?.expireAt || currentDate > isExistUser.authentication.expireAt) {
-          await User.findByIdAndUpdate(isExistUser._id, {
-               $set: {
-                    'authentication.oneTimeCode': null,
-                    'authentication.expireAt': null,
-               },
-          });
-          throw new AppError(StatusCodes.BAD_REQUEST, 'OTP has expired. Please request a new one.');
-     }
+     // // Check OTP expiration
+     // const currentDate = new Date();
+     // if (!isExistUser.authentication?.expireAt || currentDate > isExistUser.authentication.expireAt) {
+     //      await User.findByIdAndUpdate(isExistUser._id, {
+     //           $set: {
+     //                'authentication.oneTimeCode': null,
+     //                'authentication.expireAt': null,
+     //           },
+     //      });
+     //      throw new AppError(StatusCodes.BAD_REQUEST, 'OTP has expired. Please request a new one.');
+     // }
 
      let message;
      let verifyToken;
