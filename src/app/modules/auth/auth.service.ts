@@ -121,22 +121,21 @@ const resendOtpFromDb = async (payload: { email?: string; contact?: string }) =>
      session.startTransaction();
      try {
           // Update user document with session
-          const user = await User.findOneAndUpdate(
+          await User.findOneAndUpdate(
                { _id: isExistUser._id },
                { $set: { authentication } },
                { session }, // Pass session as an option
           );
           // send sms for otp
           console.log('*/*/*/*/*/*/*/*/*/*/*/');
-          // await sendSMS(isExistUser.contact!, `Your OTP is ${otp}`);
+          await sendSMS(isExistUser.contact!, `Your OTP is ${otp}`);
           // Commit the transaction
           await session.commitTransaction();
           session.endSession();
 
-          // return {
-          //      isVerified: true,
-          // };
-          return {user,authentication}
+          return {
+               isVerified: true,
+          };
      } catch (error) {
           console.log('🚀 ~ resendOtpFromDb ~ error:', error);
           // Abort the transaction on error
@@ -146,7 +145,57 @@ const resendOtpFromDb = async (payload: { email?: string; contact?: string }) =>
           throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Otp not sent.');
      }
 };
+// const resendOtpFromDb = async (payload: { email?: string; contact?: string }) => {
+//      console.log('🚀 ~ resendOtpFromDb ~ payload:', payload);
+//      // Check if the user exists
+//      let isExistUser;
+//      if (payload.email) {
+//           delete payload.contact;
+//           isExistUser = await User.isExistUserByEmail(payload.email);
+//      } else {
+//           delete payload.email;
+//           isExistUser = await User.isExistUserByContact(payload.contact!);
+//      }
+//      // if (!isExistUser || !isExistUser._id) {
+//      //      throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist**!");
+//      // }
+
+//      // send email
+//      const otp = generateOTP(4);
+//      //save to DB
+//      const authentication = { oneTimeCode: otp, expireAt: new Date(Date.now() + 3 * 60000) };
+
+//      const session = await mongoose.startSession();
+//      session.startTransaction();
+//      try {
+//           // Update user document with session
+//           const user = await User.findOneAndUpdate(
+//                { _id: isExistUser._id },
+//                { $set: { authentication } },
+//                { session }, // Pass session as an option
+//           );
+//           // send sms for otp
+//           console.log('*/*/*/*/*/*/*/*/*/*/*/');
+//           // await sendSMS(isExistUser.contact!, `Your OTP is ${otp}`);
+//           // Commit the transaction
+//           await session.commitTransaction();
+//           session.endSession();
+
+//           // return {
+//           //      isVerified: true,
+//           // };
+//           return {user,authentication}
+//      } catch (error) {
+//           console.log('🚀 ~ resendOtpFromDb ~ error:', error);
+//           // Abort the transaction on error
+//           await session.abortTransaction();
+//           session.endSession();
+
+//           throw new AppError(StatusCodes.INTERNAL_SERVER_ERROR, 'Otp not sent.');
+//      }
+// };
 //forget password by email url
+
 const forgetPasswordByUrlToDB = async (email: string) => {
      // Check if the user exists
      const isExistUser = await User.isExistUserByEmail(email);
