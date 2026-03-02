@@ -233,7 +233,7 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
      } else {
           isExistUser = await User.findOne({ email }).select('+authentication');
      }
-
+     console.log({isExistUser})
      if (!isExistUser) {
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
      }
