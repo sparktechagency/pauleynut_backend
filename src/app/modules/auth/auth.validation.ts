@@ -7,12 +7,12 @@ const createVerifyContactZodSchema = z.object({
                email: z.string().optional(),
                campaignId: z.string(),
                oneTimeCode: z.number({ required_error: 'One time code is required' }),
-               isForLogin: boolean({ required_error: 'Is for login is required' }),
+               isFromWebsite: boolean({ required_error: 'isFromWebsite is required' }),
           })
 
           .superRefine(async (data, ctx) => {
                // Check if the role is not 'USER' and add a custom error
-               if (data.isForLogin && !data.contact) {
+               if (data.isFromWebsite && !data.contact) {
                     ctx.addIssue({
                          path: ['contact'],
                          message: 'Contact is required for login',
@@ -20,7 +20,7 @@ const createVerifyContactZodSchema = z.object({
                     });
                }
 
-               if (!data.isForLogin && !data.email) {
+               if (!data.isFromWebsite && !data.email) {
                     ctx.addIssue({
                          path: ['email'],
                          message: 'Email is required for reset password',

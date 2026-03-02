@@ -224,11 +224,11 @@ const forgetPasswordByUrlToDB = async (email: string) => {
 };
 
 const verifyContactToDB = async (payload: IVerifyContact) => {
-     const { contact, oneTimeCode, email, campaignId } = payload;
+     const { contact, oneTimeCode, email, campaignId, isFromWebsite } = payload;
 
      // Find user
      let isExistUser;
-     if (payload.isForLogin) {
+     if (isFromWebsite) {
           isExistUser = await User.findOne({ contact }).select('+authentication');
      } else {
           isExistUser = await User.findOne({ email }).select('+authentication');
@@ -265,11 +265,11 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
      let user;
 
      // ✅ Handle verification based on scenario
-     if (!isExistUser.verified || payload.isForLogin) {
+     if (!isExistUser.verified || isFromWebsite) {
           // Scenario 1: First time verification OR Login verification
 
           // ✅ Increment totalLogin if it's a login
-          if (payload.isForLogin) {
+          if (isFromWebsite) {
                await User.findOneAndUpdate(
                     { _id: isExistUser._id },
                     {
@@ -309,12 +309,12 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
                config.jwt.jwt_expire_in as string,
           );
 
-          message = payload.isForLogin ? 'Login successful' : 'Contact verification successful';
+          message = isFromWebsite ? 'Login successful' : 'Contact verification successful';
 
           user = await User.findById(isExistUser._id);
 
-          // ✅ Check for campaign
-          const campaign = await getCampaignId(isExistUser._id);
+          // // ✅ Check for campaign
+          // const campaign = await getCampaignId(isExistUser._id);
 
           const response: any = {
                isVerified: true,

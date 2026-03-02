@@ -2,7 +2,7 @@ export type IVerifyContact = {
      contact?: string;
      email?: string;
      oneTimeCode: number;
-     isForLogin: boolean;
+     isFromWebsite: boolean;
      campaignId:string;
 };
 
