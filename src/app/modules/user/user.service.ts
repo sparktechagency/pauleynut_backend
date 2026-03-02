@@ -51,10 +51,10 @@ const createUserToDB = async (payload: { name: string; contact: string; role: US
           // Send OTP
           // await sendSMS(user!.contact!, `Your OTP is ${otp}`);
 
-          // ✅ Get user with authentication
-          const userWithAuth = await User.findById(user!._id).select('+authentication');
+          // // ✅ Get user with authentication
+          // const userWithAuth = await User.findById(user!._id).select('+authentication');
 
-          const userResponse: any = userWithAuth?.toObject();
+          const userResponse: any = user.toObject();
           if (userResponse?.authentication) {
                userResponse.authentication = {
                     oneTimeCode: userResponse.authentication.oneTimeCode,

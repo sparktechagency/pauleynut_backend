@@ -10,7 +10,7 @@ import auth from '../../middleware/auth';
 const createUser = catchAsync(async (req, res) => {
      const { ...userData } = req.body;
      const result = await UserService.createUserToDB(userData);
-     console.log({result})
+
      sendResponse(res, {
           success: true,
           statusCode: StatusCodes.OK,
