@@ -502,23 +502,21 @@ const alertAboutCampaign = async (payload: Partial<ICampaign>, campaignId: strin
 };
 
 const duplicateCampaignById = async (id: string) => {
-   const campaign = await Campaign.findById(id).lean();
+  const campaign = await Campaign.findById(id).lean();
 
-   if (!campaign) {
-      throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found.');
-   }
+  if (!campaign) {
+    throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found.');
+  }
 
-   // Remove unwanted fields
-   delete campaign._id;
-   delete campaign.createdAt;
-   delete campaign.updatedAt;
+  // Omit unwanted fields using destructuring
+  const { _id, createdAt, updatedAt, ...campaignData } = campaign;
 
-   const duplicateCampaign = await Campaign.create({
-      ...campaign,
-      title: `${campaign.title} (Copy)` // optional rename
-   });
+  const duplicateCampaign = await Campaign.create({
+    ...campaignData,
+    title: `${campaign.title} (Copy)`,
+  });
 
-   return duplicateCampaign;
+  return duplicateCampaign;
 };
 
 export const campaignService = {

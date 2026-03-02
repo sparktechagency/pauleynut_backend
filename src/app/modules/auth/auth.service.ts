@@ -121,7 +121,7 @@ const resendOtpFromDb = async (payload: { email?: string; contact?: string }) =>
      session.startTransaction();
      try {
           // Update user document with session
-          await User.findOneAndUpdate(
+          const user = await User.findOneAndUpdate(
                { _id: isExistUser._id },
                { $set: { authentication } },
                { session }, // Pass session as an option
@@ -133,9 +133,10 @@ const resendOtpFromDb = async (payload: { email?: string; contact?: string }) =>
           await session.commitTransaction();
           session.endSession();
 
-          return {
-               isVerified: true,
-          };
+          // return {
+          //      isVerified: true,
+          // };
+          return user
      } catch (error) {
           console.log('🚀 ~ resendOtpFromDb ~ error:', error);
           // Abort the transaction on error
