@@ -136,7 +136,7 @@ const resendOtpFromDb = async (payload: { email?: string; contact?: string }) =>
           // return {
           //      isVerified: true,
           // };
-          return {...user,authentication}
+          return {user,authentication}
      } catch (error) {
           console.log('🚀 ~ resendOtpFromDb ~ error:', error);
           // Abort the transaction on error
