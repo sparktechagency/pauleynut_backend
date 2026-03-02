@@ -128,7 +128,7 @@ const resendOtpFromDb = async (payload: { email?: string; contact?: string }) =>
           );
           // send sms for otp
           console.log('*/*/*/*/*/*/*/*/*/*/*/');
-          await sendSMS(isExistUser.contact!, `Your OTP is ${otp}`);
+          // await sendSMS(isExistUser.contact!, `Your OTP is ${otp}`);
           // Commit the transaction
           await session.commitTransaction();
           session.endSession();
