@@ -15,6 +15,9 @@ import { UserLevel } from './user.enum';
 
 // ✅ FIXED: OTP সহ user return করুন
 const createUserToDB = async (payload: { name: string; contact: string; role: USER_ROLES }): Promise<any> => {
+     if (!payload.contact?.trim()) {
+          throw new AppError(StatusCodes.BAD_REQUEST, 'Contact required');
+     }
      const otp = generateOTP(4);
      const authentication = {
           oneTimeCode: otp,
@@ -78,17 +81,19 @@ const createUserToDB = async (payload: { name: string; contact: string; role: US
                     { new: true }
                );
 
-               await sendSMS(existingUser!.contact!, `Your OTP is ${otp}`);
+               // await sendSMS(existingUser!.contact!, `Your OTP is ${otp}`);
 
-               const userWithAuth = await User.findById(existingUser!._id).select('+authentication');
-               const userResponse: any = userWithAuth?.toObject();
+               // const userWithAuth = await User.findById(existingUser!._id).select('+authentication');
+               // const userResponse: any = userWithAuth?.toObject();
 
-               if (userResponse?.authentication) {
-                    userResponse.authentication = {
-                         oneTimeCode: userResponse.authentication.oneTimeCode,
-                         expireAt: userResponse.authentication.expireAt
-                    };
-               }
+               // if (userResponse?.authentication) {
+               //      userResponse.authentication = {
+               //           oneTimeCode: userResponse.authentication.oneTimeCode,
+               //           expireAt: userResponse.authentication.expireAt
+               //      };
+               // }
+                const userResponse: any = existingUser!.toObject();
+                userResponse.authentication = authentication;
 
                return userResponse;
           }

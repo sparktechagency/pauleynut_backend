@@ -5,7 +5,7 @@ export const createUserZodSchema = z.object({
      body: z
           .object({
                name: z.string({ required_error: 'Name is required' }).min(2, 'Name must be at least 2 characters long'),
-               contact: string().default(''),
+               contact: string(),
                role: z.nativeEnum(USER_ROLES),
           })
           .superRefine(async (data, ctx) => {
