@@ -3,7 +3,7 @@ export type IVerifyContact = {
      email?: string;
      oneTimeCode: number;
      isFromWebsite: boolean;
-     campaignId:string;
+     campaignId?:string;
 };
 
 export type ILoginData = {

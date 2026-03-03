@@ -1,16 +1,25 @@
 import { boolean, z } from 'zod';
+import { USER_ROLES } from '../../../enums/user';
 
 const createVerifyContactZodSchema = z.object({
      body: z
           .object({
                contact: z.string().optional(),
                email: z.string().optional(),
-               campaignId: z.string(),
+               campaignId: z.string().optional(),
+               role: z.nativeEnum(USER_ROLES),
                oneTimeCode: z.number({ required_error: 'One time code is required' }),
-               isFromWebsite: boolean({ required_error: 'isFromWebsite is required' }),
+               isFromWebsite: z.boolean({ required_error: 'isFromWebsite is required' }),
           })
 
           .superRefine(async (data, ctx) => {
+               if (data.role === USER_ROLES.USER  && !data.campaignId) {
+                    ctx.addIssue({
+                         path: ['campaignId'],
+                         message: 'campaignId is required for USER',
+                         code: z.ZodIssueCode.custom,
+                    });
+               }
                // Check if the role is not 'USER' and add a custom error
                if (data.isFromWebsite && !data.contact) {
                     ctx.addIssue({

@@ -269,7 +269,7 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
           // Scenario 1: First time verification OR Login verification
 
           // ✅ Increment totalLogin if it's a login
-          if (isFromWebsite) {
+          if (isFromWebsite && campaignId) {
                await User.findOneAndUpdate(
                     { _id: isExistUser._id },
                     {
