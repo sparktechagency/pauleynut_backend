@@ -1,19 +1,26 @@
 import { boolean, z } from 'zod';
 import { USER_ROLES } from '../../../enums/user';
+import { isValidObjectId } from 'mongoose';
 
 const createVerifyContactZodSchema = z.object({
      body: z
           .object({
                contact: z.string().optional(),
                email: z.string().optional(),
-               campaignId: z.string().optional(),
+               campaignId: z
+                    .string()
+                    .optional()
+                    .refine(
+                         (val) => !val || isValidObjectId(val),
+                         { message: "Invalid campaignId" }
+                    ),
                role: z.nativeEnum(USER_ROLES),
                oneTimeCode: z.number({ required_error: 'One time code is required' }),
                isFromWebsite: z.boolean({ required_error: 'isFromWebsite is required' }),
           })
 
           .superRefine(async (data, ctx) => {
-               if (data.role === USER_ROLES.USER  && !data.campaignId) {
+               if (data.role === USER_ROLES.USER && !data.campaignId) {
                     ctx.addIssue({
                          path: ['campaignId'],
                          message: 'campaignId is required for USER',

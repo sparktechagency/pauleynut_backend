@@ -13,7 +13,7 @@ import generateOTP from '../../../utils/generateOTP';
 import cryptoToken from '../../../utils/cryptoToken';
 import { verifyToken } from '../../../utils/verifyToken';
 import { createToken } from '../../../utils/createToken';
-import mongoose from 'mongoose';
+import mongoose, { isValidObjectId } from 'mongoose';
 import sendSMS from '../../../shared/sendSMS';
 import { Campaign } from '../campaign/campaign.model';
 import { getCampaignId } from './getCampingId';
@@ -269,7 +269,7 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
           // Scenario 1: First time verification OR Login verification
 
           // ✅ Increment totalLogin if it's a login
-          if (isFromWebsite && campaignId) {
+          if (isFromWebsite && isValidObjectId(campaignId)) {
                await User.findOneAndUpdate(
                     { _id: isExistUser._id },
                     {
