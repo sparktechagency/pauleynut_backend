@@ -1,9 +1,12 @@
+import { USER_ROLES } from "../enums/user";
+
 export type IVerifyContact = {
      contact?: string;
      email?: string;
      oneTimeCode: number;
      isFromWebsite: boolean;
-     campaignId?:string;
+     campaignId?: string;
+     role: USER_ROLES;
 };
 
 export type ILoginData = {

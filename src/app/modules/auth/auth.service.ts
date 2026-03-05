@@ -17,6 +17,7 @@ import mongoose, { isValidObjectId } from 'mongoose';
 import sendSMS from '../../../shared/sendSMS';
 import { Campaign } from '../campaign/campaign.model';
 import { getCampaignId } from './getCampingId';
+import { USER_ROLES } from '../../../enums/user';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
@@ -66,10 +67,10 @@ const loginUserFromDB = async (payload: ILoginData) => {
      const accessToken = jwtHelper.createToken(jwtData, config.jwt.jwt_secret as Secret, config.jwt.jwt_expire_in as string);
      const refreshToken = jwtHelper.createToken(jwtData, config.jwt.jwt_refresh_secret as string, config.jwt.jwt_refresh_expire_in as string);
 
-     const campaign = await getCampaignId(isExistUser._id);
+     const campaignId = await getCampaignId(isExistUser._id);
 
-     if (campaign) {
-          return { accessToken, refreshToken, campaignId: campaign?._id };
+     if (campaignId) {
+          return { accessToken, refreshToken, campaignId: campaignId };
      } else {
           return { accessToken, refreshToken };
      }
@@ -224,7 +225,7 @@ const forgetPasswordByUrlToDB = async (email: string) => {
 };
 
 const verifyContactToDB = async (payload: IVerifyContact) => {
-     const { contact, oneTimeCode, email, campaignId, isFromWebsite } = payload;
+     const { contact, oneTimeCode, email, campaignId, isFromWebsite, role } = payload;
 
      // Find user
      let isExistUser;
@@ -233,7 +234,7 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
      } else {
           isExistUser = await User.findOne({ email }).select('+authentication');
      }
-     console.log({isExistUser})
+
      if (!isExistUser) {
           throw new AppError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
      }
@@ -269,7 +270,7 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
           // Scenario 1: First time verification OR Login verification
 
           // ✅ Increment totalLogin if it's a login
-          if (isFromWebsite && isValidObjectId(campaignId)) {
+          if (isFromWebsite && isValidObjectId(campaignId) && role === USER_ROLES.USER) {
                await User.findOneAndUpdate(
                     { _id: isExistUser._id },
                     {
@@ -280,7 +281,7 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
                          },
                          // $inc: { totalLogin: 1 },
                          $addToSet: {
-                           loggedinCampaigns: campaignId 
+                              loggedinCampaigns: campaignId
                          }
                     },
                );
@@ -314,14 +315,14 @@ const verifyContactToDB = async (payload: IVerifyContact) => {
           user = await User.findById(isExistUser._id);
 
           // // ✅ Check for campaign
-          // const campaign = await getCampaignId(isExistUser._id);
+          const lastCampaign4Admin = await getCampaignId(isExistUser._id);
 
           const response: any = {
                isVerified: true,
                message,
                accessToken,
-               user, // ✅ totalLogin included
-               campaignId
+               loggedinCampaigns: role === USER_ROLES.USER ? user?.loggedinCampaigns : undefined, // ✅ totalLogin included
+               campaignId: role === USER_ROLES.USER ? campaignId : lastCampaign4Admin,
           };
 
           // if (campaign) {
