@@ -13,12 +13,13 @@ const verifyContact = catchAsync(async (req, res) => {
 
      sendResponse(res, {
           success: true, statusCode: StatusCodes.OK, message: result.message,
-          data: {
-               verifyToken: result.verifyToken,
-               accessToken: result.accessToken,
-               isVerified: true, campaignId: result.campaignId,
-               loggedinCampaigns: result.user.loggedinCampaigns
-          }
+          // data: {
+          //      verifyToken: result.verifyToken,
+          //      accessToken: result.accessToken,
+          //      isVerified: true, campaignId: result.campaignId,
+          //      loggedinCampaigns: result.user.loggedinCampaigns
+          // }
+          data: result
      });
 });
 
