@@ -1,4 +1,3 @@
-import Redis from 'ioredis';
 
 // Redis connection options
 import IORedis from 'ioredis';
@@ -20,3 +19,4 @@ redisConnection.on('error', (err) => {
 });
 
 export default redisConnection;
+
