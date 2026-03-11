@@ -139,6 +139,8 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
   }),
 );
+
+app.options("*", cors());
 // Body parser
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
