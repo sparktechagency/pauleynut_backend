@@ -119,33 +119,48 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(Morgan.successHandler);
 app.use(Morgan.errorHandler);
 
-// ========== SIMPLE CORS FIX ==========
-app.use(
-  cors({
-    origin: [
-      'http://10.10.7.79:3001',
-      'http://10.10.7.79:3002',
-      'http://localhost:3002',
-      'http://10.10.7.37:3002',
-      'http://204.197.173.144:3002',
-      'http://localhost:3000',
-      'https://dashboard.gopassit.org',
-      'https://www.gopassit.org',
-      'https://gopassit.org',
-      'https://api.gopassit.org'
-    ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
-  }),
-);
+// ================== CORS CONFIG ==================
 
-app.options("*", cors());
-// Body parser
+const allowedOrigins = [
+  'http://10.10.7.79:3001',
+  'http://10.10.7.79:3002',
+  'http://localhost:3002',
+  'http://10.10.7.37:3002',
+  'http://204.197.173.144:3002',
+  'http://localhost:3000',
+  'https://dashboard.gopassit.org',
+  'https://www.gopassit.org',
+  'https://gopassit.org'
+];
+
+const corsOptions: cors.CorsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow postman/server requests
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
+};
+
+// Apply CORS
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
+// ================== BODY PARSER ==================
+
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 
-// Session configuration
+// ================== SESSION ==================
+
 app.use(
   session({
     secret: config.express_session as string,
@@ -159,26 +174,29 @@ app.use(
   }),
 );
 
-// Initialize Passport
+// ================== PASSPORT ==================
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Static files
+// ================== STATIC FILES ==================
+
 app.use(express.static('uploads'));
 app.use(express.static('public'));
 
-// Router
+// ================== ROUTES ==================
+
 app.use('/api/v1', router);
 
-// Live response
+// ================== ROOT ==================
+
 app.get('/', (req: Request, res: Response) => {
   res.send(welcome());
 });
 
-// Global error handler
-app.use(globalErrorHandler);
+// ================== ERROR HANDLING ==================
 
-// Handle not found route
+app.use(globalErrorHandler);
 app.use(notFound);
 
 export default app;
