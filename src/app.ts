@@ -97,7 +97,6 @@
 // // setupTimeManagement();
 // export default app;
 
-
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
 import session from 'express-session';
@@ -115,10 +114,6 @@ const app: Application = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Morgan
-app.use(Morgan.successHandler);
-app.use(Morgan.errorHandler);
-
 // ================== CORS CONFIG ==================
 
 const allowedOrigins = [
@@ -130,34 +125,44 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://dashboard.gopassit.org',
   'https://www.gopassit.org',
-  'https://gopassit.org'
+  'https://gopassit.org',
+  'https://api.gopassit.org',
 ];
 
 const corsOptions: cors.CorsOptions = {
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow postman/server requests
+    // Allow requests with no origin (Postman, mobile apps, server-to-server)
+    if (!origin) return callback(null, true);
 
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error(`CORS blocked for origin: ${origin}`));
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
+  optionsSuccessStatus: 200, // Some browsers (IE11) choke on 204
 };
 
-// Apply CORS
+// ✅ Handle preflight FIRST — before any other middleware
+app.options('*', cors(corsOptions));
+
+// ✅ Apply CORS globally
 app.use(cors(corsOptions));
 
-// Handle preflight requests
-app.options('*', cors(corsOptions));
+// ================== MORGAN ==================
+
+app.use(Morgan.successHandler);
+app.use(Morgan.errorHandler);
 
 // ================== BODY PARSER ==================
 
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+
+// ================== VIEW ENGINE ==================
 
 // ================== SESSION ==================
 
@@ -169,6 +174,7 @@ app.use(
     cookie: {
       secure: config.node_env === 'production',
       httpOnly: true,
+      sameSite: config.node_env === 'production' ? 'none' : 'lax', // ✅ Required for cross-origin cookies
       maxAge: 24 * 60 * 60 * 1000,
     },
   }),
