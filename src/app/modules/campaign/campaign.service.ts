@@ -501,23 +501,93 @@ const alertAboutCampaign = async (payload: Partial<ICampaign>, campaignId: strin
      console.log('Campaign history:', campaignHistories);
 };
 
+// const duplicateCampaignById = async (id: string) => {
+//   const campaign = await Campaign.findById(id).lean();
+
+//   if (!campaign) {
+//     throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found.');
+//   }
+
+//   // Omit unwanted fields using destructuring
+//   const { _id, createdAt, updatedAt,campaignStatus, ...campaignData } = campaign;
+
+//   const duplicateCampaign = await Campaign.create({
+//     ...campaignData,
+//     title: `${campaign.title} (Copy)`,
+//     campaignStatus: CampaignStatus.ACTIVE
+//   });
+
+//   return duplicateCampaign;
+// };
+
+
 const duplicateCampaignById = async (id: string) => {
-  const campaign = await Campaign.findById(id).lean();
+  const session = await mongoose.startSession();
 
-  if (!campaign) {
-    throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found.');
+  try {
+    session.startTransaction();
+
+    const campaign = await Campaign.findById(id).lean().session(session);
+
+    if (!campaign) {
+      throw new AppError(StatusCodes.NOT_FOUND, 'Campaign not found.');
+    }
+
+    // Omit unwanted fields
+    const {
+      _id,
+      createdAt,
+      updatedAt,
+      campaignStatus,
+      referralId,
+      ...campaignData
+    } = campaign;
+
+    // Create duplicated campaign
+    const duplicateCampaign = await Campaign.create(
+      [
+        {
+          ...campaignData,
+          title: `${campaign.title} (Copy)`,
+          campaignStatus: CampaignStatus.ACTIVE,
+        },
+      ],
+      { session }
+    );
+
+    const newCampaign = duplicateCampaign[0];
+
+    // Create root referral
+    const referralDoc = await ReferralModel.create(
+      [
+        {
+          campaignId: newCampaign._id,
+          phone: campaignData.createdBy,
+          parentPhone: null,
+          donationAmount: 0,
+          invitedPhones: [],
+        },
+      ],
+      { session }
+    );
+
+    const rootReferral = referralDoc[0];
+
+    // Update campaign with referralId
+    newCampaign.referralId = rootReferral._id;
+    await newCampaign.save({ session });
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return newCampaign;
+  } catch (error) {
+    // Rollback
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
   }
-
-  // Omit unwanted fields using destructuring
-  const { _id, createdAt, updatedAt,campaignStatus, ...campaignData } = campaign;
-
-  const duplicateCampaign = await Campaign.create({
-    ...campaignData,
-    title: `${campaign.title} (Copy)`,
-    campaignStatus: CampaignStatus.ACTIVE
-  });
-
-  return duplicateCampaign;
 };
 
 export const campaignService = {
