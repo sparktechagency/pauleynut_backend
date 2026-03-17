@@ -509,11 +509,12 @@ const duplicateCampaignById = async (id: string) => {
   }
 
   // Omit unwanted fields using destructuring
-  const { _id, createdAt, updatedAt, ...campaignData } = campaign;
+  const { _id, createdAt, updatedAt,campaignStatus, ...campaignData } = campaign;
 
   const duplicateCampaign = await Campaign.create({
     ...campaignData,
     title: `${campaign.title} (Copy)`,
+    campaignStatus: CampaignStatus.ACTIVE
   });
 
   return duplicateCampaign;
