@@ -446,6 +446,7 @@ const invitePeopleToCampaign = async (
      }
 };
 
+
 const alertAboutCampaign = async (payload: Partial<ICampaign>, campaignId: string) => {
      // Step 1: Retrieve and update the campaign
      const campaign = await Campaign.findByIdAndUpdate(campaignId, payload, {
@@ -556,13 +557,18 @@ const duplicateCampaignById = async (id: string) => {
     );
 
     const newCampaign = duplicateCampaign[0];
+    const user = await User.findById(campaign.createdBy).lean().session(session);
+
+    if (!user) {
+      throw new AppError(StatusCodes.NOT_FOUND, 'User not found.');
+    }
 
     // Create root referral
     const referralDoc = await ReferralModel.create(
       [
         {
           campaignId: newCampaign._id,
-          phone: campaignData.createdBy,
+          phone: user.contact,
           parentPhone: null,
           donationAmount: 0,
           invitedPhones: [],
@@ -573,17 +579,14 @@ const duplicateCampaignById = async (id: string) => {
 
     const rootReferral = referralDoc[0];
 
-    // Update campaign with referralId
     newCampaign.referralId = rootReferral._id;
     await newCampaign.save({ session });
 
-    // Commit transaction
     await session.commitTransaction();
     session.endSession();
 
     return newCampaign;
   } catch (error) {
-    // Rollback
     await session.abortTransaction();
     session.endSession();
     throw error;
